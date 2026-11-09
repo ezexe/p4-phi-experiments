@@ -1,0 +1,23 @@
+# The two repositories this project experiments across keep their own git (ezexe/p4, ezexe/phi).
+/p4/
+/phi/
+# The session store is its own git repository (p4-memory, p4-scratchpad, p4-recall write it).
+/.claude/p4/
+
+# The shared environment and its secrets.
+/.venv/
+.env
+.env.*
+!.env.example
+
+# Experiment outputs that are not text.
+__pycache__/
+.ipynb_checkpoints/
+*.pt
+*.onnx
+experiments/**/out/
+experiments/**/out-*/
+
+# The per-machine p4 store (p4-recall writes it at .claude/p4, its own git repository): private to each user and PC.
+# Experiments read a store through --store / P4_STORE_REPO, never from this tree.
+.claude/p4/
