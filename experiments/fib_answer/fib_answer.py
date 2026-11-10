@@ -56,7 +56,7 @@ sys.path.insert(0, str(ROOT / "p4" / "lbiza" / "plugins" / "p4-recall" / "script
 STOP, EDITED, INVOKED, CITED = 1, 2, 3, 4
 ACT_NAMES = {EDITED: "edited", INVOKED: "invoked", CITED: "cited"}
 KINDS = ("store", "file", "symbol", "commit")
-CHECK_MOD = 89
+CHECK_MOD = 1597          # F(17): one damaged lesson in 1,597 passes its check by chance
 MAX_RECORDS = 8            # an answer's records
 PER_GROUP = 2              # of one file
 CANDIDATES = 300           # entries the pupil weighs for one question

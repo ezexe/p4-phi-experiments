@@ -30,8 +30,8 @@ Trained on the 234 earliest lessons, its stop line set on the next 42, graded on
 
 | | precision | recall | a right record in |
 |---|---|---|---|
-| the pupil | 0.280 | 0.412 | 39 of 70 |
-| the entries the latest answers named | 0.300 | 0.442 | 39 of 70 |
+| the pupil | 0.282 | 0.415 | 39 of 70 |
+| the entries the latest answers named | 0.302 | 0.445 | 39 of 70 |
 | words in common with the question | 0.023 | 0.033 | 8 of 70 |
 
 - The pupil answers twelve times better than word overlap, and gets the act right on 92% of its right records.
@@ -45,14 +45,15 @@ The same 346 lessons written as lines of words (`compare`):
 | | fibinary | prose |
 |---|---|---|
 | the lessons the pupil is told | the same, number for number | the same |
-| size | 40,959 bytes | 283,997 bytes (6.9 times) |
-| time to read (Python) | 57 ms | 7 ms |
-| one bit flipped: caught | 96.8% | 99.6% |
-| one bit flipped: read as something else, no sign | 3.2% | 0.2% |
+| size | 41,215 bytes | 283,997 bytes (6.9 times) |
+| time to read (Python) | 49 ms | 6 ms |
+| one bit flipped: caught | 99.3% | 99.6% |
+| one bit flipped: read as something else, no sign | 0.7% | 0.2% |
 
 The pupil learns the same from either, by construction: both say the same numbers.
-Fibinary is seven times smaller; prose is faster to read here and catches slightly more damage, because a damaged word is a word nobody knows.
-Before the check code covered the question's words, fibinary let 38% of flips through.
+So fibinary is what the pupil is spoken to in: it says the same, in a seventh of the bytes, and catches damage as well as prose does.
+That last part had to be earned: with a check code over the records alone it let 38% of flips through, over the question's words too 3.2%, and with the check taken modulo 1,597 instead of 89, 0.7%.
+Prose is still faster to read in Python, which matters to nothing at this size.
 
 ## What it cannot do
 
