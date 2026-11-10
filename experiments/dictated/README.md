@@ -29,6 +29,8 @@ Either way a recommendation comes out that rests on the instruction and not on a
 - `list` prints every directive with its class, the day it was last written and its id; free.
 - `check` runs the two free steps (extract, ground) and writes `results/ground.md`.
 - `run` without `--paid` uses a fake client: extraction and the ground check are real, the verdicts are placeholders.
+- `run --only ID ...` probes exactly those directives, whatever the ledger says: the way to give a line the further probes a decision needs.
+- `decide --ledgers DIR ...` reads the paid ledgers of those output directories and writes `results/decisions.md`: per line, its verdicts so far and what they allow; free.
 - `--instructions FILE_OR_DIR ...` names the instruction files (or `P4_INSTRUCTIONS` in `.env`); the default is the p4 checkout's skills, `scripts/session/fresh/emission-plain.md` and the rebuild-seed contracts.
 - `--store <project>/.claude/p4` adds that store's live rulings (`store/rules.md`, each dated by its own `time:` field), its corrections, retractions and facts, all scrubbed of the store's committers' names.
 - `--project DIR` names the project the instructions are about; the default is the store's project, else the first instruction file's repository.
@@ -55,7 +57,7 @@ Either way a recommendation comes out that rests on the instruction and not on a
 | STALE | wrong | wrong | replace it with the dated fact |
 | DATED | the owner's choice stands, the value it names has moved | | keep the choice, update the value |
 | NEEDED | right | wrong | keep it, with its date and source |
-| REDUNDANT | right | right | candidate to drop |
+| REDUNDANT | right | right | read it before dropping: see Limits |
 | PREFERENCE-STEERS | no fact settles it | would do otherwise | keep it: the line works |
 | PREFERENCE-SAME | no fact settles it | does the same unprompted | keeping or dropping it changes nothing today |
 
@@ -72,8 +74,16 @@ Beside the verdict: whether the value a datable directive names is still current
 
 The drafts are for the owner to review; nothing is written to a store or a skill.
 
+## Deciding
+
+One probe is one message a model wrote to make the line matter, and the same line has come back NEEDED from one probe and TRAP from the next.
+So `decide` changes nothing on fewer than three probes: `rewrite` when most say TRAP, STALE or DATED, `keep` when most say NEEDED or PREFERENCE-STEERS, `same when asked` when every one says REDUNDANT or PREFERENCE-SAME, `undecided` with the number of probes still needed otherwise.
+`same when asked` is never a drop by itself.
+On the first store measured, five lines reached it, and four of them were steps of a procedure (parse the arguments, run this command, walk this decision tree): the model answers the same when the question is put to it, which does not show it would take the step unprompted.
+
 ## Limits
 
+- REDUNDANT measures the answer to a direct question, not whether the model would act on the line unasked; a line that works as a step or a reminder can be REDUNDANT every time and still be doing its job.
 - The probe is written by a model that sees the directive, so the message is built to make the directive matter; the share of each verdict says nothing about how often a real session meets such a message.
 - The grounded arm is right only as far as the documentation it found; a value that is the project's own comes back UNKNOWN.
 - A single API call has no tools and no session, so a directive that only acts through a hook or a tool call is not exercised.

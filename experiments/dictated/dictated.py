@@ -105,6 +105,8 @@ JUDGE_MODEL = "claude-opus-5-5"
 RECHECK_DAYS = 30                               # a verdict older than this is measured again
 PROBE_VERSION = 3                               # 2: a datable probe hinges on the named value; 3: the value gets a
                                                 # search of its own. A verdict of another version is measured again
+AGREE_MIN = 3                                   # probes that must agree before a line is dropped or rewritten
+ONLY = set()                                    # directive ids (or text hashes) to probe, whatever the ledger says
 PROJECT = ""                                    # the project the instructions are about; "" = worked out (project_dir)
 FACTS_SAMPLE = 12                               # store facts searched again per run, the longest unchecked first
 GREP_MAX = 1500                                 # identifiers looked for in the project per run
@@ -192,7 +194,7 @@ PROBE_SYSTEM = ("You write test messages for an AI coding agent. You are given o
 ADVICE = {"TRAP": "drop it, or replace it with the dated fact: the model decides this right without it, and it is wrong now",
           "STALE": "replace it with the dated fact: the directive and the model's own knowledge are both behind",
           "DATED": "keep the choice and update the value it names: the value has moved since the line was written",
-          "REDUNDANT": "candidate to drop: it is right, and the model decides the same without it",
+          "REDUNDANT": "it is right, and asked directly the model answers the same without it; a probe cannot show whether the model would act on it unprompted, so read the line before dropping it",
           "NEEDED": "keep it, with its date and source: it carries what the model lacks",
           "PREFERENCE-STEERS": "keep it: the owner's choice, and without it the model does otherwise",
           "PREFERENCE-SAME": "the owner's choice, and the model does the same unprompted: keeping or dropping it changes nothing today"}
@@ -628,6 +630,9 @@ def is_fresh(ledger, d, model=None, now=None):
 def pick(directives, ledger):
     """The run's sample: datable directives by evidence strength then age (oldest first), manner directives by age,
     MANNER_SHARE of the sample for manner and what either lacks filled from the other. Fresh verdicts are skipped."""
+    if ONLY:                                    # the lines a decision is waiting on: probed again, fresh or not
+        due = [d for d in directives if d["id"] in ONLY or d["sha"] in ONLY]
+        return due[:PROBE_SAMPLE], len(due)
     due = [d for d in directives if d["class"] in ("datable", "manner") and not is_fresh(ledger, d)]
     dat = sorted((d for d in due if d["class"] == "datable"), key=lambda d: (-d["strength"], d["written"], d["id"]))
     man = sorted((d for d in due if d["class"] == "manner"), key=lambda d: (d["written"], d["id"]))
@@ -952,9 +957,67 @@ def run(paid=False, work=None, instructions=None, store=None, sample=None, proje
     return step_report(directives, probed, trained, ground, facts)
 
 
+def decision(verdicts):
+    """What a line's verdicts so far allow, and how many more probes a decision needs. One probe is one message a
+    model wrote to make the line matter, so a line is changed only when AGREE_MIN probes say the same and none says
+    the line works: `same when asked` (every probe REDUNDANT or PREFERENCE-SAME; never an automatic drop: a probe asks
+    the question outright, so it cannot show that the model would take a procedure's step unprompted), `rewrite` (TRAP, STALE or DATED in most),
+    `keep` (NEEDED or PREFERENCE-STEERS in most). A verdict from before the preference split counts for nothing."""
+    v = [x for x in verdicts if x != "PREFERENCE"]
+    n = len(v)
+    idle = sum(x in ("REDUNDANT", "PREFERENCE-SAME") for x in v)
+    wrong = sum(x in WRONG for x in v)
+    works = sum(x in ("NEEDED", "PREFERENCE-STEERS") for x in v)
+    if n >= AGREE_MIN and idle == n:
+        return "same when asked", 0
+    if n >= AGREE_MIN and wrong > n / 2:
+        return "rewrite", 0
+    if n >= AGREE_MIN and works > n / 2:
+        return "keep", 0
+    if n >= AGREE_MIN + 2:                       # five probes and no majority: the line depends on the situation
+        return "keep (the probes disagree)", 0
+    return "undecided", max(1, AGREE_MIN - n)
+
+
+def step_decide(dirs):
+    """Every probed line's verdicts over the paid ledgers of `dirs` (each a WORK directory), with what they allow:
+    results/decisions.md under WORK. Free."""
+    rows, text = {}, {}
+    for d in dirs:
+        f = Path(d) / "results" / "ledger.tsv"
+        if not f.exists():
+            continue
+        for line in f.read_text(encoding="utf-8").splitlines()[1:]:
+            r = dict(zip(LEDGER_HEAD, line.split("\t")))
+            rows.setdefault(r["id"], []).append(r)
+        try:
+            for x in json.loads((Path(d) / "results" / "directives.json").read_text(encoding="utf-8")):
+                text[x["id"]] = x["text"]
+        except (OSError, ValueError):
+            pass
+    out = []
+    for i, rs in rows.items():
+        what, more = decision([r["verdict"] for r in rs])
+        out.append({"id": i, "verdicts": [r["verdict"] for r in rs], "decision": what, "more": more, "text": text.get(i, "")})
+    order = {"rewrite": 0, "same when asked": 1, "undecided": 2}
+    out.sort(key=lambda r: (order.get(r["decision"], 3), r["more"], r["id"]))
+    L = ["# What the probes so far allow", "",
+         f"A line is dropped or rewritten only when {AGREE_MIN} probes agree and none says it works.", "",
+         "| decision | lines |", "|---|---|"]
+    L += [f"| {k} | {v} |" for k, v in Counter(r["decision"] for r in out).most_common()] + [""]
+    for r in out:
+        L += [f"- **{r['decision']}**" + (f" ({r['more']} more to decide)" if r["more"] else "") + f": `{r['id']}` "
+              f"{', '.join(r['verdicts'])}", f"  - {scrub(r['text'])[:220]}"]
+    (results() / "decisions.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    (results() / "decisions.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("cmd", choices=["list", "check", "run"])
+    ap.add_argument("cmd", choices=["list", "check", "run", "decide"])
+    ap.add_argument("--ledgers", nargs="*", default=[], help="decide: the WORK directories whose ledgers to read")
+    ap.add_argument("--only", nargs="*", default=[], help="run: probe exactly these directive ids, fresh or not")
     ap.add_argument("--project", default="", help="the project the instructions are about")
     ap.add_argument("--instructions", nargs="*", default=[], help="instruction files or directories")
     ap.add_argument("--store", default="", help="a store directory (<project>/.claude/p4): its live rulings too")
@@ -967,6 +1030,14 @@ def main(argv=None):
         for d in sorted(step_extract(), key=lambda d: (d["class"], -d["strength"], d["written"])):
             say(f"{d['class']:9} {d['written']} {','.join(d['kinds']) or '-':28} {d['id']}  {d['text'][:110]}")
         return 0
+    if a.cmd == "decide":
+        configure(**({"WORK": a.work} if a.work else {}), STORE=a.store)
+        got = step_decide(a.ledgers or [WORK])
+        for r in got:
+            say(f"{r['decision']:28} {('+' + str(r['more'])) if r['more'] else '  ':3} {','.join(r['verdicts'])[:60]:60} {r['id'][-56:]}")
+        say(f"decide: {results() / 'decisions.md'}")
+        return 0
+    configure(ONLY=set(a.only))
     if a.cmd == "check":
         configure(**({"WORK": a.work} if a.work else {}), INSTRUCTIONS=a.instructions, STORE=a.store, PROJECT=a.project)
         sync()

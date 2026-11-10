@@ -247,6 +247,29 @@ class Dictated(unittest.TestCase):
         fl = dc.flips(before, probed)
         self.assertEqual([(r["id"], o["verdict"], r["verdict"]) for r, o in fl], [(rows[0]["id"], "NEEDED", "TRAP")])
 
+    def test_decision_needs_agreeing_probes(self):
+        d = dc.decision
+        self.assertEqual(d(["REDUNDANT", "REDUNDANT"]), ("undecided", 1), "two probes decide nothing")
+        self.assertEqual(d(["REDUNDANT", "PREFERENCE-SAME", "REDUNDANT"]), ("same when asked", 0))
+        self.assertEqual(d(["REDUNDANT", "REDUNDANT", "NEEDED"])[0], "undecided", "one probe found it working: not dropped")
+        self.assertEqual(d(["TRAP", "DATED", "REDUNDANT"]), ("rewrite", 0))
+        self.assertEqual(d(["NEEDED", "PREFERENCE-STEERS", "REDUNDANT"]), ("keep", 0))
+        self.assertEqual(d(["PREFERENCE", "NEEDED", "TRAP"]), ("undecided", 1), "a verdict from before the split is not counted")
+        self.assertEqual(d(["TRAP", "NEEDED", "REDUNDANT", "TRAP", "NEEDED"])[0], "keep (the probes disagree)")
+
+    def test_only_and_decide(self):
+        ds = dc.extract()
+        named = next(d for d in ds if d["class"] == "named")
+        dc.configure(ONLY={named["id"]})
+        self.assertEqual([d["id"] for d in dc.pick(ds, [])[0]], [named["id"]], "asked for by id, whatever its class")
+        dc.configure(ONLY=set(), FAKE=False)                       # the paid ledger's name, written by hand
+        dc.append_ledger([{**dict.fromkeys(dc.LEDGER_HEAD, ""), "id": "a.md:1:x", "verdict": v} for v in ("REDUNDANT",) * 3]
+                         + [{**dict.fromkeys(dc.LEDGER_HEAD, ""), "id": "b.md:2:y", "verdict": "TRAP"}])
+        got = {r["id"]: (r["decision"], r["more"]) for r in dc.step_decide([self.work])}
+        dc.configure(FAKE=True)
+        self.assertEqual(got, {"a.md:1:x": ("same when asked", 0), "b.md:2:y": ("undecided", 2)})
+        self.assertIn("**same when asked**: `a.md:1:x`", (self.work / "results" / "decisions.md").read_text(encoding="utf-8"))
+
     def test_scrub(self):
         self.assertEqual(dc.scrub("Morgan said the boss wants cmake"), "owner said the owner wants cmake")
 
