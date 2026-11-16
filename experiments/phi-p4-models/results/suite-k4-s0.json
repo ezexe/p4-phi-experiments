@@ -1,0 +1,221 @@
+{
+ "k": 4,
+ "pools": 22,
+ "minutes": 6.0,
+ "epochs": 10,
+ "folds": 4,
+ "warm": 8,
+ "shard_mb": [
+  22.8,
+  22.8,
+  23.2,
+  22.4
+ ],
+ "runs": [
+  {
+   "seed": 0,
+   "zeck_addresses": [
+    "10001",
+    "1001",
+    "101",
+    "1"
+   ],
+   "pretrain_s": {
+    "big": {
+     "sequential": 361,
+     "parallel": 361
+    },
+    "small": {
+     "sequential": 90,
+     "parallel": 90
+    },
+    "chain": {
+     "sequential": 360,
+     "parallel": 90
+    },
+    "grown": {
+     "sequential": 361,
+     "parallel": 90
+    },
+    "indep": {
+     "sequential": 360,
+     "parallel": 90
+    },
+    "zeck": {
+     "sequential": 361,
+     "parallel": 90
+    }
+   },
+   "quality": {
+    "big": 0.2239,
+    "small": 0.1776,
+    "chain_root": 0.2027,
+    "chain_ens": 0.2035,
+    "chain_ens_drop1": 0.2057,
+    "indep_ens": 0.2239,
+    "indep_ens_drop1": 0.2164,
+    "routed": 0.2096,
+    "zeck_root": 0.2063,
+    "zeck_ens": 0.2317,
+    "zeck_ens_drop1": 0.2331,
+    "grown_root": 0.1927,
+    "grown_ens": 0.1829,
+    "grown_ens_drop1": 0.1935,
+    "zeckq_ens": 0.2042,
+    "zeckq_ens_drop1": 0.203,
+    "qrouted": 0.1915,
+    "qrouted_route_hit": 0.455,
+    "zeck24_ens": 0.2185,
+    "zeck24_ens_drop1": 0.221,
+    "q24routed": 0.1779,
+    "q24routed_route_hit": 0.455
+   },
+   "deployed": {
+    "json_without": 0.3804,
+    "big": 0.3826,
+    "small": 0.3813,
+    "chain_root": 0.3518,
+    "chain_ens": 0.3867,
+    "indep_ens": 0.3661,
+    "routed": 0.3839,
+    "zeck_root": 0.3772,
+    "zeck_ens": 0.3853,
+    "grown_root": 0.3776,
+    "grown_ens": 0.3729,
+    "zeckq_ens": 0.3783,
+    "qrouted": 0.3754,
+    "zeck24_ens": 0.3745,
+    "q24routed": 0.3793
+   },
+   "stream": {
+    "big": {
+     "fresh": 0.1509,
+     "forget": 0.2524,
+     "update_s": 1.5,
+     "msg_bytes": 132921,
+     "query_ms": 9.7,
+     "params": 2113792,
+     "mb": 4.23
+    },
+    "small": {
+     "fresh": 0.1294,
+     "forget": 0.4431,
+     "update_s": 1.48,
+     "msg_bytes": 71808,
+     "query_ms": 8.6,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "chain_root": {
+     "fresh": 0.1199,
+     "forget": 0.2437,
+     "update_s": 1.5,
+     "msg_bytes": 72717,
+     "query_ms": 8.4,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "chain_ens": {
+     "fresh": 0.1537,
+     "forget": 0.2455,
+     "update_s": 5.34,
+     "msg_bytes": 290116,
+     "query_ms": 31.1,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "indep_ens": {
+     "fresh": 0.1599,
+     "forget": 0.1951,
+     "update_s": 5.18,
+     "msg_bytes": 289503,
+     "query_ms": 32.3,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "routed": {
+     "fresh": 0.1177,
+     "forget": 0.0,
+     "update_s": 1.28,
+     "msg_bytes": 72993,
+     "query_ms": 31.0,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "zeck_root": {
+     "fresh": 0.113,
+     "forget": 0.4576,
+     "update_s": 1.51,
+     "msg_bytes": 72227,
+     "query_ms": 9.7,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "zeck_ens": {
+     "fresh": 0.144,
+     "forget": 0.2479,
+     "update_s": 5.68,
+     "msg_bytes": 288543,
+     "query_ms": 32.1,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "grown_root": {
+     "fresh": 0.1154,
+     "forget": 0.2656,
+     "update_s": 1.55,
+     "msg_bytes": 133930,
+     "query_ms": 8.9,
+     "params": 2113792,
+     "mb": 4.23
+    },
+    "grown_ens": {
+     "fresh": 0.113,
+     "forget": 0.2847,
+     "update_s": 5.69,
+     "msg_bytes": 534785,
+     "query_ms": 32.8,
+     "params": 8455168,
+     "mb": 16.91
+    },
+    "zeckq_ens": {
+     "fresh": 0.1499,
+     "forget": 0.2618,
+     "update_s": 5.17,
+     "msg_bytes": 151660,
+     "query_ms": 30.5,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "qrouted": {
+     "fresh": 0.1205,
+     "forget": 0.2014,
+     "update_s": 1.32,
+     "msg_bytes": 37152,
+     "query_ms": 8.8,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "zeck24_ens": {
+     "fresh": 0.1356,
+     "forget": 0.2687,
+     "update_s": 5.55,
+     "msg_bytes": 152248,
+     "query_ms": 34.2,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "q24routed": {
+     "fresh": 0.1019,
+     "forget": 0.2913,
+     "update_s": 1.44,
+     "msg_bytes": 37757,
+     "query_ms": 9.1,
+     "params": 2163712,
+     "mb": 4.33
+    }
+   },
+   "seconds": 4481
+  }
+ ]
+}

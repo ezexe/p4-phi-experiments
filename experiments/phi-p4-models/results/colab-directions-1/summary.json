@@ -1,0 +1,131 @@
+{
+ "run": "directions-1",
+ "at": "2026-10-29 15:36",
+ "pins": {
+  "phi": "fd61ea629bfc5a12c3b217e40829869c7898b0de",
+  "p4": "04eee31281f5636b2abdd6d84809d80ecafb22fb",
+  "store": "e5df5faaba85f0fafff1dcab6120a52d8bef429c"
+ },
+ "devices": [
+  {
+   "at": "2026-10-29 13:41",
+   "device": "cpu",
+   "cpus": 2
+  }
+ ],
+ "from_run": "q-matrix-t4",
+ "pathways_run": "pathways-t4",
+ "claims": {
+  "D1 the JSON ranker ranks better than plain word overlap (store's labels)": "holds",
+  "D2 a shorter pretraining budget ranks better than the longest": "holds",
+  "D2 some pretraining budget's .pt raises the JSON ranker on every seed": "does not hold",
+  "D4 the fable labels are more learnable than the store's (trained and scored on themselves, best budget)": "holds",
+  "D4 the opus labels are more learnable than the store's (trained and scored on themselves, best budget)": "holds",
+  "D4 training on the fable labels predicts the store's labels at least as well as training on them": "holds",
+  "D4 training on the opus labels predicts the store's labels at least as well as training on them": "does not hold",
+  "D4 the two teachers agree with each other more than either agrees with the store's labels": "holds",
+  "D5 the \u03c6 structure matters": "not measured"
+ },
+ "implied_settings": {
+  "pool-effort": "low or unnamed (the JSON ranker alone)",
+  "pretraining budget": "1 min (best held-out ranking)",
+  "labels": "train on the teachers' labels: they are more learnable than the store's"
+ },
+ "json_ranker": {
+  "pools": 24,
+  "store": {
+   "json_ranker": 0.3788,
+   "term_overlap": 0.3129,
+   "pools": 24
+  },
+  "fable": {
+   "json_ranker": 0.4137,
+   "term_overlap": 0.3768,
+   "pools": 24
+  },
+  "opus": {
+   "json_ranker": 0.3846,
+   "term_overlap": 0.3618,
+   "pools": 24
+  }
+ },
+ "agreement_f1": {
+  "store~fable": 0.5322,
+  "store~opus": 0.5024,
+  "fable~opus": 0.7538
+ },
+ "by_budget": {
+  "0.5": {
+   "store->store": 0.1825,
+   "store->fable": 0.1961,
+   "store->opus": 0.1893,
+   "fable->store": 0.1992,
+   "fable->fable": 0.2172,
+   "fable->opus": 0.2189,
+   "opus->store": 0.1649,
+   "opus->fable": 0.2109,
+   "opus->opus": 0.222,
+   "deployed": 0.3728,
+   "steps": 94,
+   "best_steps": 40
+  },
+  "1": {
+   "store->store": 0.186,
+   "store->fable": 0.1925,
+   "store->opus": 0.1868,
+   "fable->store": 0.1962,
+   "fable->fable": 0.2172,
+   "fable->opus": 0.2204,
+   "opus->store": 0.1701,
+   "opus->fable": 0.2091,
+   "opus->opus": 0.2205,
+   "deployed": 0.3728,
+   "steps": 176,
+   "best_steps": 38
+  },
+  "2": {
+   "store->store": 0.1777,
+   "store->fable": 0.1915,
+   "store->opus": 0.1893,
+   "fable->store": 0.1978,
+   "fable->fable": 0.2206,
+   "fable->opus": 0.2293,
+   "opus->store": 0.1652,
+   "opus->fable": 0.2148,
+   "opus->opus": 0.2222,
+   "deployed": 0.374,
+   "steps": 456,
+   "best_steps": 44
+  },
+  "4": {
+   "store->store": 0.1784,
+   "store->fable": 0.1931,
+   "store->opus": 0.186,
+   "fable->store": 0.1965,
+   "fable->fable": 0.2187,
+   "fable->opus": 0.2293,
+   "opus->store": 0.1652,
+   "opus->fable": 0.2109,
+   "opus->opus": 0.2192,
+   "deployed": 0.374,
+   "steps": 991,
+   "best_steps": 47
+  },
+  "6": {
+   "store->store": 0.1784,
+   "store->fable": 0.1931,
+   "store->opus": 0.186,
+   "fable->store": 0.1965,
+   "fable->fable": 0.2187,
+   "fable->opus": 0.2293,
+   "opus->store": 0.1652,
+   "opus->fable": 0.2109,
+   "opus->opus": 0.2192,
+   "deployed": 0.374,
+   "steps": 1640,
+   "best_steps": 47
+  }
+ },
+ "d3": {},
+ "d5": null
+}

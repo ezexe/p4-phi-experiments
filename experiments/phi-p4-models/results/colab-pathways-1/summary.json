@@ -1,0 +1,264 @@
+{
+ "run": "pathways-1",
+ "at": "2026-10-29 17:53",
+ "pins": {
+  "phi": "be6e94fdb41a7dabc82013136ed8d5182dd9606a",
+  "p4": "04eee31281f5636b2abdd6d84809d80ecafb22fb",
+  "store": "e5df5faaba85f0fafff1dcab6120a52d8bef429c"
+ },
+ "devices": [
+  {
+   "at": "2026-10-29 12:54",
+   "device": "cpu",
+   "cpus": 2
+  }
+ ],
+ "plan": {
+  "k": [
+   4
+  ],
+  "seeds": [
+   0,
+   1,
+   2
+  ],
+  "minutes": 6.0,
+  "epochs": 10,
+  "check_s": 30
+ },
+ "by_k": [
+  {
+   "k": 4,
+   "seeds": 3,
+   "big": 0.1837,
+   "zeck_ens": 0.1848,
+   "btree_ens": 0.1931,
+   "flat_ens": 0.1903,
+   "zeck_root": 0.1764,
+   "btree_root": 0.193,
+   "phi_routed": 0.1622,
+   "24_routed": 0.1541,
+   "rand_routed": 0.1588,
+   "heavy_routed": 0.1841,
+   "phi_route_hit": 0.5,
+   "24_route_hit": 0.45,
+   "rand_route_hit": 0.5,
+   "heavy_route_hit": 0.6333
+  }
+ ],
+ "early_stopping": {
+  "4": [
+   {
+    "big": {
+     "best_score": 0.1375,
+     "best_steps": 0,
+     "steps": 1201
+    },
+    "zeck 10001": {
+     "best_score": 0.03333,
+     "best_steps": 0,
+     "steps": 308
+    },
+    "zeck 1001": {
+     "best_score": 0.01667,
+     "best_steps": 0,
+     "steps": 344
+    },
+    "zeck 101": {
+     "best_score": 0.01667,
+     "best_steps": 0,
+     "steps": 324
+    },
+    "zeck 1": {
+     "best_score": 0.01667,
+     "best_steps": 77,
+     "steps": 307
+    },
+    "btree 4": {
+     "best_score": 0.05,
+     "best_steps": 0,
+     "steps": 475
+    },
+    "btree 2": {
+     "best_score": 0.05,
+     "best_steps": 0,
+     "steps": 500
+    },
+    "btree 3": {
+     "best_score": 0.01667,
+     "best_steps": 480,
+     "steps": 480
+    },
+    "btree 1": {
+     "best_score": 0.0,
+     "best_steps": 0,
+     "steps": 458
+    },
+    "flat 1": {
+     "best_score": 0.02083,
+     "best_steps": 159,
+     "steps": 489
+    },
+    "flat 2": {
+     "best_score": 0.06667,
+     "best_steps": 0,
+     "steps": 514
+    },
+    "flat 3": {
+     "best_score": 0.02083,
+     "best_steps": 160,
+     "steps": 493
+    },
+    "flat 4": {
+     "best_score": 0.08333,
+     "best_steps": 0,
+     "steps": 463
+    }
+   },
+   {
+    "big": {
+     "best_score": 0.04167,
+     "best_steps": 68,
+     "steps": 1206
+    },
+    "zeck 10001": {
+     "best_score": 0.03333,
+     "best_steps": 0,
+     "steps": 311
+    },
+    "zeck 1001": {
+     "best_score": 0.05,
+     "best_steps": 87,
+     "steps": 351
+    },
+    "zeck 101": {
+     "best_score": 0.02083,
+     "best_steps": 327,
+     "steps": 327
+    },
+    "zeck 1": {
+     "best_score": 0.02083,
+     "best_steps": 0,
+     "steps": 308
+    },
+    "btree 4": {
+     "best_score": 0.05417,
+     "best_steps": 160,
+     "steps": 477
+    },
+    "btree 2": {
+     "best_score": 0.08333,
+     "best_steps": 334,
+     "steps": 495
+    },
+    "btree 3": {
+     "best_score": 0.05417,
+     "best_steps": 0,
+     "steps": 477
+    },
+    "btree 1": {
+     "best_score": 0.05,
+     "best_steps": 0,
+     "steps": 460
+    },
+    "flat 1": {
+     "best_score": 0.03333,
+     "best_steps": 0,
+     "steps": 461
+    },
+    "flat 2": {
+     "best_score": 0.10833,
+     "best_steps": 480,
+     "steps": 480
+    },
+    "flat 3": {
+     "best_score": 0.05417,
+     "best_steps": 0,
+     "steps": 470
+    },
+    "flat 4": {
+     "best_score": 0.12083,
+     "best_steps": 296,
+     "steps": 445
+    }
+   },
+   {
+    "big": {
+     "best_score": 0.0375,
+     "best_steps": 224,
+     "steps": 1217
+    },
+    "zeck 10001": {
+     "best_score": 0.0375,
+     "best_steps": 75,
+     "steps": 310
+    },
+    "zeck 1001": {
+     "best_score": 0.01667,
+     "best_steps": 0,
+     "steps": 335
+    },
+    "zeck 101": {
+     "best_score": 0.0375,
+     "best_steps": 0,
+     "steps": 320
+    },
+    "zeck 1": {
+     "best_score": 0.01667,
+     "best_steps": 314,
+     "steps": 314
+    },
+    "btree 4": {
+     "best_score": 0.1375,
+     "best_steps": 481,
+     "steps": 481
+    },
+    "btree 2": {
+     "best_score": 0.1375,
+     "best_steps": 0,
+     "steps": 506
+    },
+    "btree 3": {
+     "best_score": 0.10833,
+     "best_steps": 166,
+     "steps": 494
+    },
+    "btree 1": {
+     "best_score": 0.08333,
+     "best_steps": 451,
+     "steps": 451
+    },
+    "flat 1": {
+     "best_score": 0.05417,
+     "best_steps": 0,
+     "steps": 479
+    },
+    "flat 2": {
+     "best_score": 0.14583,
+     "best_steps": 163,
+     "steps": 509
+    },
+    "flat 3": {
+     "best_score": 0.05417,
+     "best_steps": 0,
+     "steps": 490
+    },
+    "flat 4": {
+     "best_score": 0.01667,
+     "best_steps": 464,
+     "steps": 464
+    }
+   }
+  ]
+ },
+ "claims": {
+  "the Zeckendorf directory tree beats the binary directory tree (ensemble, every seed)": "does not hold",
+  "the Zeckendorf tree's root beats the binary tree's root (every seed)": "does not hold",
+  "the Zeckendorf tree beats flat independent nodes (ensemble, every seed)": "does not hold",
+  "the Zeckendorf tree beats one large model (ensemble, every seed)": "does not hold",
+  "the \u03c6 mask routes to the best node more often than the heaviest-rows mask (every seed)": "does not hold",
+  "\u03c6 routing ranks better than routing by a random half of the rows (every seed)": "does not hold",
+  "\u03c6 routing ranks better than 2:4 routing (every seed)": "holds",
+  "the one large model's best dev ranking comes before its pretraining budget ends (every seed)": "holds"
+ }
+}

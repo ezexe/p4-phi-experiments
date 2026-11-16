@@ -1,0 +1,42 @@
+{
+ "items": 2000,
+ "maxlen": 12,
+ "addresses": 144,
+ "codes": {
+  "fibonacci": {
+   "bits_per_item": 11.34,
+   "decisions_per_item": 12.34,
+   "flips_detected_by_structure": 0.463,
+   "flips_detected_with_table": null,
+   "items_lost_per_flip": 1.22
+  },
+  "gamma": {
+   "bits_per_item": 14.21,
+   "decisions_per_item": 9.61,
+   "flips_detected_by_structure": 0.0,
+   "flips_detected_with_table": 0.811,
+   "items_lost_per_flip": 2.56
+  },
+  "fixed 9-bit": {
+   "bits_per_item": 9.0,
+   "decisions_per_item": 0.0,
+   "flips_detected_by_structure": 0.0,
+   "flips_detected_with_table": 0.653,
+   "items_lost_per_flip": 1.0
+  },
+  "lenfield 4-bit": {
+   "bits_per_item": 14.34,
+   "decisions_per_item": 4.0,
+   "flips_detected_by_structure": 0.741,
+   "flips_detected_with_table": null,
+   "items_lost_per_flip": 169.32
+  }
+ },
+ "growth_past_agreement": {
+  "grown_to_digits": 17,
+  "fibonacci": true,
+  "gamma": true,
+  "fixed 9-bit": false,
+  "lenfield 4-bit": false
+ }
+}

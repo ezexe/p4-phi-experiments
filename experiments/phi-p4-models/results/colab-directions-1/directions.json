@@ -1,0 +1,641 @@
+{
+ "pools": 24,
+ "dev_pools": 4,
+ "eval_pools": 20,
+ "budgets": [
+  0.5,
+  1.0,
+  2.0,
+  4.0,
+  6.0
+ ],
+ "label_sets": {
+  "store": 20,
+  "fable": 20,
+  "opus": 20
+ },
+ "device": "cpu",
+ "agreement_f1": {
+  "store~fable": 0.5322,
+  "store~opus": 0.5024,
+  "fable~opus": 0.7538
+ },
+ "json_ranker": {
+  "pools": 24,
+  "store": {
+   "json_ranker": 0.3788,
+   "term_overlap": 0.3129,
+   "pools": 24
+  },
+  "fable": {
+   "json_ranker": 0.4137,
+   "term_overlap": 0.3768,
+   "pools": 24
+  },
+  "opus": {
+   "json_ranker": 0.3846,
+   "term_overlap": 0.3618,
+   "pools": 24
+  }
+ },
+ "runs": [
+  {
+   "seed": 0,
+   "budget_min": 0.5,
+   "early_stopping": {
+    "best_score": 0.1375,
+    "best_steps": 0,
+    "steps": 66
+   },
+   "curve": [
+    [
+     0,
+     0.1375
+    ],
+    [
+     41,
+     0.0375
+    ],
+    [
+     66,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.203,
+    "store->fable": 0.2145,
+    "store->opus": 0.2139,
+    "fable->store": 0.2187,
+    "fable->fable": 0.2262,
+    "fable->opus": 0.2485,
+    "opus->store": 0.1827,
+    "opus->fable": 0.236,
+    "opus->opus": 0.2426
+   },
+   "deployed": 0.3745
+  },
+  {
+   "seed": 0,
+   "budget_min": 1.0,
+   "early_stopping": {
+    "best_score": 0.1375,
+    "best_steps": 0,
+    "steps": 168
+   },
+   "curve": [
+    [
+     0,
+     0.1375
+    ],
+    [
+     78,
+     0.0375
+    ],
+    [
+     122,
+     0.0375
+    ],
+    [
+     168,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.203,
+    "store->fable": 0.2145,
+    "store->opus": 0.2139,
+    "fable->store": 0.2187,
+    "fable->fable": 0.2262,
+    "fable->opus": 0.2485,
+    "opus->store": 0.1827,
+    "opus->fable": 0.236,
+    "opus->opus": 0.2426
+   },
+   "deployed": 0.3745
+  },
+  {
+   "seed": 0,
+   "budget_min": 2.0,
+   "early_stopping": {
+    "best_score": 0.1375,
+    "best_steps": 0,
+    "steps": 372
+   },
+   "curve": [
+    [
+     0,
+     0.1375
+    ],
+    [
+     79,
+     0.0375
+    ],
+    [
+     163,
+     0.0375
+    ],
+    [
+     214,
+     0.0375
+    ],
+    [
+     266,
+     0.0375
+    ],
+    [
+     319,
+     0.0375
+    ],
+    [
+     372,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.203,
+    "store->fable": 0.2145,
+    "store->opus": 0.2139,
+    "fable->store": 0.2187,
+    "fable->fable": 0.2262,
+    "fable->opus": 0.2485,
+    "opus->store": 0.1827,
+    "opus->fable": 0.236,
+    "opus->opus": 0.2426
+   },
+   "deployed": 0.3745
+  },
+  {
+   "seed": 0,
+   "budget_min": 4.0,
+   "early_stopping": {
+    "best_score": 0.1375,
+    "best_steps": 0,
+    "steps": 837
+   },
+   "curve": [
+    [
+     0,
+     0.1375
+    ],
+    [
+     78,
+     0.0375
+    ],
+    [
+     153,
+     0.0375
+    ],
+    [
+     232,
+     0.0375
+    ],
+    [
+     319,
+     0.0375
+    ],
+    [
+     390,
+     0.01667
+    ],
+    [
+     450,
+     0.0375
+    ],
+    [
+     511,
+     0.0375
+    ],
+    [
+     570,
+     0.0375
+    ],
+    [
+     639,
+     0.0375
+    ],
+    [
+     707,
+     0.0375
+    ],
+    [
+     773,
+     0.0375
+    ],
+    [
+     837,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.203,
+    "store->fable": 0.2145,
+    "store->opus": 0.2139,
+    "fable->store": 0.2187,
+    "fable->fable": 0.2262,
+    "fable->opus": 0.2485,
+    "opus->store": 0.1827,
+    "opus->fable": 0.236,
+    "opus->opus": 0.2426
+   },
+   "deployed": 0.3745
+  },
+  {
+   "seed": 0,
+   "budget_min": 6.0,
+   "early_stopping": {
+    "best_score": 0.1375,
+    "best_steps": 0,
+    "steps": 1529
+   },
+   "curve": [
+    [
+     0,
+     0.1375
+    ],
+    [
+     87,
+     0.0375
+    ],
+    [
+     178,
+     0.0375
+    ],
+    [
+     271,
+     0.0375
+    ],
+    [
+     356,
+     0.0375
+    ],
+    [
+     449,
+     0.0375
+    ],
+    [
+     541,
+     0.01667
+    ],
+    [
+     630,
+     0.0375
+    ],
+    [
+     727,
+     0.0375
+    ],
+    [
+     819,
+     0.0375
+    ],
+    [
+     895,
+     0.0375
+    ],
+    [
+     971,
+     0.0375
+    ],
+    [
+     1045,
+     0.05833
+    ],
+    [
+     1120,
+     0.0375
+    ],
+    [
+     1203,
+     0.05833
+    ],
+    [
+     1285,
+     0.02083
+    ],
+    [
+     1369,
+     0.0
+    ],
+    [
+     1456,
+     0.02083
+    ],
+    [
+     1529,
+     0.0
+    ]
+   ],
+   "quality": {
+    "store->store": 0.203,
+    "store->fable": 0.2145,
+    "store->opus": 0.2139,
+    "fable->store": 0.2187,
+    "fable->fable": 0.2262,
+    "fable->opus": 0.2485,
+    "opus->store": 0.1827,
+    "opus->fable": 0.236,
+    "opus->opus": 0.2426
+   },
+   "deployed": 0.3745
+  },
+  {
+   "seed": 1,
+   "budget_min": 0.5,
+   "early_stopping": {
+    "best_score": 0.05833,
+    "best_steps": 80,
+    "steps": 123
+   },
+   "curve": [
+    [
+     0,
+     0.0
+    ],
+    [
+     80,
+     0.05833
+    ],
+    [
+     123,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.162,
+    "store->fable": 0.1776,
+    "store->opus": 0.1647,
+    "fable->store": 0.1798,
+    "fable->fable": 0.2083,
+    "fable->opus": 0.1893,
+    "opus->store": 0.1472,
+    "opus->fable": 0.1859,
+    "opus->opus": 0.2014
+   },
+   "deployed": 0.3711
+  },
+  {
+   "seed": 1,
+   "budget_min": 1.0,
+   "early_stopping": {
+    "best_score": 0.05833,
+    "best_steps": 77,
+    "steps": 183
+   },
+   "curve": [
+    [
+     0,
+     0.0
+    ],
+    [
+     77,
+     0.05833
+    ],
+    [
+     130,
+     0.0375
+    ],
+    [
+     183,
+     0.0375
+    ]
+   ],
+   "quality": {
+    "store->store": 0.1689,
+    "store->fable": 0.1706,
+    "store->opus": 0.1597,
+    "fable->store": 0.1737,
+    "fable->fable": 0.2083,
+    "fable->opus": 0.1923,
+    "opus->store": 0.1575,
+    "opus->fable": 0.1821,
+    "opus->opus": 0.1984
+   },
+   "deployed": 0.3711
+  },
+  {
+   "seed": 1,
+   "budget_min": 2.0,
+   "early_stopping": {
+    "best_score": 0.05833,
+    "best_steps": 89,
+    "steps": 540
+   },
+   "curve": [
+    [
+     0,
+     0.0
+    ],
+    [
+     89,
+     0.05833
+    ],
+    [
+     184,
+     0.0375
+    ],
+    [
+     271,
+     0.05833
+    ],
+    [
+     361,
+     0.0375
+    ],
+    [
+     455,
+     0.01667
+    ],
+    [
+     540,
+     0.01667
+    ]
+   ],
+   "quality": {
+    "store->store": 0.1523,
+    "store->fable": 0.1685,
+    "store->opus": 0.1647,
+    "fable->store": 0.177,
+    "fable->fable": 0.215,
+    "fable->opus": 0.21,
+    "opus->store": 0.1476,
+    "opus->fable": 0.1936,
+    "opus->opus": 0.2018
+   },
+   "deployed": 0.3735
+  },
+  {
+   "seed": 1,
+   "budget_min": 4.0,
+   "early_stopping": {
+    "best_score": 0.05833,
+    "best_steps": 94,
+    "steps": 1145
+   },
+   "curve": [
+    [
+     0,
+     0.0
+    ],
+    [
+     94,
+     0.05833
+    ],
+    [
+     185,
+     0.0375
+    ],
+    [
+     282,
+     0.05833
+    ],
+    [
+     378,
+     0.01667
+    ],
+    [
+     474,
+     0.01667
+    ],
+    [
+     573,
+     0.01667
+    ],
+    [
+     665,
+     0.01667
+    ],
+    [
+     762,
+     0.0
+    ],
+    [
+     861,
+     0.01667
+    ],
+    [
+     955,
+     0.0
+    ],
+    [
+     1055,
+     0.0
+    ],
+    [
+     1145,
+     0.0
+    ]
+   ],
+   "quality": {
+    "store->store": 0.1537,
+    "store->fable": 0.1718,
+    "store->opus": 0.1582,
+    "fable->store": 0.1743,
+    "fable->fable": 0.2112,
+    "fable->opus": 0.2102,
+    "opus->store": 0.1476,
+    "opus->fable": 0.1858,
+    "opus->opus": 0.1957
+   },
+   "deployed": 0.3735
+  },
+  {
+   "seed": 1,
+   "budget_min": 6.0,
+   "early_stopping": {
+    "best_score": 0.05833,
+    "best_steps": 94,
+    "steps": 1752
+   },
+   "curve": [
+    [
+     0,
+     0.0
+    ],
+    [
+     94,
+     0.05833
+    ],
+    [
+     187,
+     0.0375
+    ],
+    [
+     285,
+     0.05833
+    ],
+    [
+     380,
+     0.01667
+    ],
+    [
+     477,
+     0.01667
+    ],
+    [
+     577,
+     0.01667
+    ],
+    [
+     671,
+     0.01667
+    ],
+    [
+     771,
+     0.0
+    ],
+    [
+     872,
+     0.01667
+    ],
+    [
+     968,
+     0.0
+    ],
+    [
+     1070,
+     0.0
+    ],
+    [
+     1170,
+     0.0
+    ],
+    [
+     1268,
+     0.0
+    ],
+    [
+     1369,
+     0.0
+    ],
+    [
+     1465,
+     0.0
+    ],
+    [
+     1565,
+     0.0
+    ],
+    [
+     1667,
+     0.0
+    ],
+    [
+     1752,
+     0.0
+    ]
+   ],
+   "quality": {
+    "store->store": 0.1537,
+    "store->fable": 0.1718,
+    "store->opus": 0.1582,
+    "fable->store": 0.1743,
+    "fable->fable": 0.2112,
+    "fable->opus": 0.2102,
+    "opus->store": 0.1476,
+    "opus->fable": 0.1858,
+    "opus->opus": 0.1957
+   },
+   "deployed": 0.3735
+  }
+ ]
+}

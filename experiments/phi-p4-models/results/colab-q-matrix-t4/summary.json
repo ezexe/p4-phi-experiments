@@ -1,0 +1,384 @@
+{
+ "run": "q-matrix-t4",
+ "at": "2026-10-29 12:40",
+ "pins": {
+  "phi": "d039f00225c5749220045e14ea4bb8f0fa32880b",
+  "p4": "0157bbda3f6349494953605e4e995c61e942f08a",
+  "store": "bdd69831bad870d663d0b39fae48f36c4f140385"
+ },
+ "devices": [
+  {
+   "at": "2026-10-28 15:52",
+   "device": "Tesla T4",
+   "cpus": 2
+  },
+  {
+   "at": "2026-10-28 16:13",
+   "device": "Tesla T4",
+   "cpus": 2
+  },
+  {
+   "at": "2026-10-29 11:52",
+   "device": "cpu",
+   "cpus": 2
+  }
+ ],
+ "plan": {
+  "k": [
+   2,
+   3,
+   4
+  ],
+  "seeds": [
+   0,
+   1
+  ],
+  "minutes": 6.0,
+  "epochs": 10
+ },
+ "by_k": [
+  {
+   "k": 2,
+   "seeds": 2,
+   "big": 0.1853,
+   "zeck_ens": 0.1724,
+   "zeck_wins_every_seed": false,
+   "qrouted": 0.1612,
+   "q24routed": 0.1522,
+   "route_hit": 0.771,
+   "route_hit_24": 0.75,
+   "chance": 0.5,
+   "pretrained_on": [
+    "cuda Tesla T4"
+   ],
+   "big_steps": [
+    35870,
+    36072
+   ],
+   "deployed_zeck_ens": 0.3841,
+   "deployed_json": 0.3788
+  },
+  {
+   "k": 3,
+   "seeds": 2,
+   "big": 0.1912,
+   "zeck_ens": 0.2188,
+   "zeck_wins_every_seed": false,
+   "qrouted": 0.1786,
+   "q24routed": 0.16,
+   "route_hit": 0.667,
+   "route_hit_24": 0.5415,
+   "chance": 0.3333,
+   "pretrained_on": [
+    "cuda Tesla T4"
+   ],
+   "big_steps": [
+    36120,
+    34976
+   ],
+   "deployed_zeck_ens": 0.3772,
+   "deployed_json": 0.3788
+  },
+  {
+   "k": 4,
+   "seeds": 2,
+   "big": 0.1957,
+   "zeck_ens": 0.1857,
+   "zeck_wins_every_seed": false,
+   "qrouted": 0.1519,
+   "q24routed": 0.196,
+   "route_hit": 0.3955,
+   "route_hit_24": 0.479,
+   "chance": 0.25,
+   "pretrained_on": [
+    "cuda Tesla T4"
+   ],
+   "big_steps": [
+    35331,
+    36677
+   ],
+   "deployed_zeck_ens": 0.3733,
+   "deployed_json": 0.3788
+  }
+ ],
+ "tree_heldout": {
+  "medium": 0.1579,
+  "high": 0.1579
+ },
+ "pt_weights": {
+  "ranker": {
+   "pt": false,
+   "pt_effort": null,
+   "without_pt": 0.3788,
+   "with_pt": 0.3751,
+   "pt_from": "ranker"
+  },
+  "medium": {
+   "pt": false,
+   "pt_effort": null,
+   "without_pt": 0.3788,
+   "with_pt": 0.3757,
+   "pt_from": "tree:medium"
+  },
+  "high": {
+   "pt": false,
+   "pt_effort": null,
+   "without_pt": 0.3788,
+   "with_pt": 0.3652,
+   "pt_from": "tree:high"
+  }
+ },
+ "teacher": {
+  "model": "claude-fable-5-1",
+  "pools": 24,
+  "labelled_by_teacher": 24,
+  "compared": 24,
+  "declined": [],
+  "agreement": {
+   "precision": 0.5075,
+   "recall": 0.6048,
+   "f1": 0.5081
+  },
+  "cross": {
+   "store": {
+    "store": 0.165,
+    "teacher": 0.1652
+   },
+   "teacher": {
+    "store": 0.1606,
+    "teacher": 0.2019
+   }
+  },
+  "usage": {
+   "input_tokens": 917450,
+   "output_tokens": 29278
+  },
+  "per_pool": [
+   {
+    "pool": "00d49f80",
+    "store": 18,
+    "teacher": 16,
+    "both": 13,
+    "precision": 0.8125,
+    "recall": 0.7222,
+    "f1": 0.7647
+   },
+   {
+    "pool": "11c9d549",
+    "store": 12,
+    "teacher": 14,
+    "both": 5,
+    "precision": 0.3571,
+    "recall": 0.4167,
+    "f1": 0.3846
+   },
+   {
+    "pool": "1385151b",
+    "store": 9,
+    "teacher": 15,
+    "both": 8,
+    "precision": 0.5333,
+    "recall": 0.8889,
+    "f1": 0.6667
+   },
+   {
+    "pool": "18725c88",
+    "store": 15,
+    "teacher": 11,
+    "both": 7,
+    "precision": 0.6364,
+    "recall": 0.4667,
+    "f1": 0.5385
+   },
+   {
+    "pool": "1f40b362",
+    "store": 18,
+    "teacher": 9,
+    "both": 5,
+    "precision": 0.5556,
+    "recall": 0.2778,
+    "f1": 0.3704
+   },
+   {
+    "pool": "4029346f",
+    "store": 11,
+    "teacher": 17,
+    "both": 9,
+    "precision": 0.5294,
+    "recall": 0.8182,
+    "f1": 0.6429
+   },
+   {
+    "pool": "4b499438",
+    "store": 12,
+    "teacher": 14,
+    "both": 7,
+    "precision": 0.5,
+    "recall": 0.5833,
+    "f1": 0.5385
+   },
+   {
+    "pool": "55c0e00a",
+    "store": 15,
+    "teacher": 9,
+    "both": 7,
+    "precision": 0.7778,
+    "recall": 0.4667,
+    "f1": 0.5833
+   },
+   {
+    "pool": "59eb733f",
+    "store": 18,
+    "teacher": 13,
+    "both": 10,
+    "precision": 0.7692,
+    "recall": 0.5556,
+    "f1": 0.6452
+   },
+   {
+    "pool": "5ea64489",
+    "store": 8,
+    "teacher": 9,
+    "both": 3,
+    "precision": 0.3333,
+    "recall": 0.375,
+    "f1": 0.3529
+   },
+   {
+    "pool": "66ff1f9e",
+    "store": 18,
+    "teacher": 14,
+    "both": 11,
+    "precision": 0.7857,
+    "recall": 0.6111,
+    "f1": 0.6875
+   },
+   {
+    "pool": "865e2291",
+    "store": 8,
+    "teacher": 5,
+    "both": 5,
+    "precision": 1.0,
+    "recall": 0.625,
+    "f1": 0.7692
+   },
+   {
+    "pool": "8879ab96",
+    "store": 15,
+    "teacher": 12,
+    "both": 5,
+    "precision": 0.4167,
+    "recall": 0.3333,
+    "f1": 0.3704
+   },
+   {
+    "pool": "88841377",
+    "store": 12,
+    "teacher": 18,
+    "both": 9,
+    "precision": 0.5,
+    "recall": 0.75,
+    "f1": 0.6
+   },
+   {
+    "pool": "8bfcfedf",
+    "store": 3,
+    "teacher": 17,
+    "both": 2,
+    "precision": 0.1176,
+    "recall": 0.6667,
+    "f1": 0.2
+   },
+   {
+    "pool": "a3ac5de6",
+    "store": 1,
+    "teacher": 3,
+    "both": 1,
+    "precision": 0.3333,
+    "recall": 1.0,
+    "f1": 0.5
+   },
+   {
+    "pool": "c0b07aeb",
+    "store": 5,
+    "teacher": 11,
+    "both": 1,
+    "precision": 0.0909,
+    "recall": 0.2,
+    "f1": 0.125
+   },
+   {
+    "pool": "d40f36a3",
+    "store": 6,
+    "teacher": 18,
+    "both": 4,
+    "precision": 0.2222,
+    "recall": 0.6667,
+    "f1": 0.3333
+   },
+   {
+    "pool": "da2932b9",
+    "store": 3,
+    "teacher": 15,
+    "both": 3,
+    "precision": 0.2,
+    "recall": 1.0,
+    "f1": 0.3333
+   },
+   {
+    "pool": "da545d71",
+    "store": 3,
+    "teacher": 8,
+    "both": 2,
+    "precision": 0.25,
+    "recall": 0.6667,
+    "f1": 0.3636
+   },
+   {
+    "pool": "e4bc3231",
+    "store": 18,
+    "teacher": 15,
+    "both": 13,
+    "precision": 0.8667,
+    "recall": 0.7222,
+    "f1": 0.7879
+   },
+   {
+    "pool": "e86cf9e6",
+    "store": 16,
+    "teacher": 15,
+    "both": 9,
+    "precision": 0.6,
+    "recall": 0.5625,
+    "f1": 0.5806
+   },
+   {
+    "pool": "edd8bca8",
+    "store": 12,
+    "teacher": 16,
+    "both": 7,
+    "precision": 0.4375,
+    "recall": 0.5833,
+    "f1": 0.5
+   },
+   {
+    "pool": "f59288e0",
+    "store": 18,
+    "teacher": 18,
+    "both": 10,
+    "precision": 0.5556,
+    "recall": 0.5556,
+    "f1": 0.5556
+   }
+  ]
+ },
+ "claims": {
+  "k = 4 is the only node count where the Zeckendorf ensemble beats one large model on every seed": "does not hold",
+  "the matrix route finds the best node above chance at every k": "holds",
+  "\u03c6 routing ranks better than 2:4 routing at every k": "does not hold",
+  "the tree at high ranks better than at medium (held out)": "does not hold",
+  "the JSON ranker keeps the tree's .pt weight at high": "does not hold",
+  "training on the teacher's labels predicts the store's own labels at least as well as training on them": "does not hold"
+ },
+ "k_where_zeck_beats_big_every_seed": []
+}

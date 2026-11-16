@@ -1,0 +1,255 @@
+{
+ "k": 4,
+ "pools": 24,
+ "minutes": 6.0,
+ "epochs": 10,
+ "folds": 4,
+ "warm": 8,
+ "shard_mb": [
+  23.5,
+  23.0,
+  23.2,
+  23.2
+ ],
+ "runs": [
+  {
+   "seed": 0,
+   "zeck_addresses": [
+    "10001",
+    "1001",
+    "101",
+    "1"
+   ],
+   "pretrain_s": {
+    "big": {
+     "sequential": 361,
+     "parallel": 361
+    },
+    "small": {
+     "sequential": 90,
+     "parallel": 90
+    },
+    "chain": {
+     "sequential": 360,
+     "parallel": 90
+    },
+    "grown": {
+     "sequential": 360,
+     "parallel": 90
+    },
+    "indep": {
+     "sequential": 360,
+     "parallel": 90
+    },
+    "zeck": {
+     "sequential": 360,
+     "parallel": 90
+    }
+   },
+   "pretrained_on": "cuda Tesla T4",
+   "pretrain_steps": {
+    "big": [
+     35331
+    ],
+    "small": [
+     1007
+    ],
+    "chain": [
+     8630,
+     9170,
+     9147,
+     8250
+    ],
+    "grown": [
+     8850,
+     9172,
+     9014,
+     8075
+    ],
+    "indep": [
+     8428,
+     9066,
+     8964,
+     8052
+    ],
+    "zeck": [
+     8633,
+     9106,
+     9033,
+     8317
+    ]
+   },
+   "finetuned_on": "cuda",
+   "quality": {
+    "big": 0.1938,
+    "small": 0.1895,
+    "chain_root": 0.1737,
+    "chain_ens": 0.1976,
+    "chain_ens_drop1": 0.1959,
+    "indep_ens": 0.1879,
+    "indep_ens_drop1": 0.1775,
+    "routed": 0.1838,
+    "zeck_root": 0.1716,
+    "zeck_ens": 0.1901,
+    "zeck_ens_drop1": 0.1928,
+    "grown_root": 0.1607,
+    "grown_ens": 0.1797,
+    "grown_ens_drop1": 0.1652,
+    "zeckq_ens": 0.2037,
+    "zeckq_ens_drop1": 0.1861,
+    "qrouted": 0.1615,
+    "qrouted_route_hit": 0.458,
+    "zeck24_ens": 0.2187,
+    "zeck24_ens_drop1": 0.2102,
+    "q24routed": 0.1845,
+    "q24routed_route_hit": 0.458
+   },
+   "deployed": {
+    "json_without": 0.3788,
+    "big": 0.3807,
+    "small": 0.3805,
+    "chain_root": 0.3759,
+    "chain_ens": 0.3761,
+    "indep_ens": 0.3272,
+    "routed": 0.3385,
+    "zeck_root": 0.3743,
+    "zeck_ens": 0.3711,
+    "grown_root": 0.3705,
+    "grown_ens": 0.379,
+    "zeckq_ens": 0.3843,
+    "qrouted": 0.3778,
+    "zeck24_ens": 0.3813,
+    "q24routed": 0.3711
+   },
+   "stream": {
+    "big": {
+     "fresh": 0.1386,
+     "forget": 0.2531,
+     "update_s": 0.48,
+     "msg_bytes": 138391,
+     "query_ms": 19.5,
+     "params": 2113792,
+     "mb": 4.23
+    },
+    "small": {
+     "fresh": 0.1086,
+     "forget": 0.4778,
+     "update_s": 0.41,
+     "msg_bytes": 73247,
+     "query_ms": 18.2,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "chain_root": {
+     "fresh": 0.1402,
+     "forget": 0.2021,
+     "update_s": 0.42,
+     "msg_bytes": 74343,
+     "query_ms": 17.7,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "chain_ens": {
+     "fresh": 0.1193,
+     "forget": 0.2726,
+     "update_s": 1.71,
+     "msg_bytes": 297647,
+     "query_ms": 69.2,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "indep_ens": {
+     "fresh": 0.1531,
+     "forget": 0.4962,
+     "update_s": 1.68,
+     "msg_bytes": 296208,
+     "query_ms": 70.9,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "routed": {
+     "fresh": 0.091,
+     "forget": 0.0,
+     "update_s": 0.41,
+     "msg_bytes": 74296,
+     "query_ms": 66.1,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "zeck_root": {
+     "fresh": 0.0933,
+     "forget": 0.5056,
+     "update_s": 0.41,
+     "msg_bytes": 73719,
+     "query_ms": 19.3,
+     "params": 540928,
+     "mb": 1.08
+    },
+    "zeck_ens": {
+     "fresh": 0.1269,
+     "forget": 0.2288,
+     "update_s": 1.69,
+     "msg_bytes": 295906,
+     "query_ms": 66.1,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "grown_root": {
+     "fresh": 0.1046,
+     "forget": 0.3278,
+     "update_s": 0.47,
+     "msg_bytes": 137956,
+     "query_ms": 18.3,
+     "params": 2113792,
+     "mb": 4.23
+    },
+    "grown_ens": {
+     "fresh": 0.0944,
+     "forget": 0.3288,
+     "update_s": 1.94,
+     "msg_bytes": 553972,
+     "query_ms": 70.9,
+     "params": 8455168,
+     "mb": 16.91
+    },
+    "zeckq_ens": {
+     "fresh": 0.1278,
+     "forget": 0.3538,
+     "update_s": 1.65,
+     "msg_bytes": 154074,
+     "query_ms": 69.8,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "qrouted": {
+     "fresh": 0.1043,
+     "forget": 0.1101,
+     "update_s": 0.4,
+     "msg_bytes": 38278,
+     "query_ms": 19.4,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "zeck24_ens": {
+     "fresh": 0.1201,
+     "forget": 0.2844,
+     "update_s": 1.63,
+     "msg_bytes": 151688,
+     "query_ms": 69.0,
+     "params": 2163712,
+     "mb": 4.33
+    },
+    "q24routed": {
+     "fresh": 0.1341,
+     "forget": 0.3986,
+     "update_s": 0.4,
+     "msg_bytes": 38627,
+     "query_ms": 20.2,
+     "params": 2163712,
+     "mb": 4.33
+    }
+   },
+   "seconds": 3330
+  }
+ ]
+}

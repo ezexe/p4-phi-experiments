@@ -1,0 +1,79 @@
+{
+ "automaton_is_M": [
+  [
+   1,
+   1
+  ],
+  [
+   1,
+   0
+  ]
+ ],
+ "M_power_and_cassini_to_n": 39,
+ "addresses_per_length": {
+  "1": 1,
+  "2": 0,
+  "3": 1,
+  "4": 1,
+  "5": 2,
+  "6": 3,
+  "7": 5,
+  "8": 8,
+  "9": 13,
+  "10": 21,
+  "11": 34,
+  "12": 55,
+  "13": 89,
+  "14": 144,
+  "15": 233,
+  "16": 377,
+  "17": 610,
+  "18": 987,
+  "19": 1597,
+  "20": 2584
+ },
+ "distinct_zeckendorf_values": 6765,
+ "phi_mask_no_adjacent_rows_trials": 200,
+ "stream_logic": {
+  "items": 2000,
+  "maxlen": 12,
+  "addresses": 144,
+  "codes": {
+   "fibonacci": {
+    "bits_per_item": 11.34,
+    "decisions_per_item": 12.34,
+    "flips_detected_by_structure": 0.472,
+    "flips_detected_with_table": null,
+    "items_lost_per_flip": 1.23
+   },
+   "gamma": {
+    "bits_per_item": 14.21,
+    "decisions_per_item": 9.61,
+    "flips_detected_by_structure": 0.001,
+    "flips_detected_with_table": 0.806,
+    "items_lost_per_flip": 2.41
+   },
+   "fixed 9-bit": {
+    "bits_per_item": 9.0,
+    "decisions_per_item": 0.0,
+    "flips_detected_by_structure": 0.0,
+    "flips_detected_with_table": 0.664,
+    "items_lost_per_flip": 1.0
+   },
+   "lenfield 4-bit": {
+    "bits_per_item": 14.34,
+    "decisions_per_item": 4.0,
+    "flips_detected_by_structure": 0.727,
+    "flips_detected_with_table": null,
+    "items_lost_per_flip": 164.82
+   }
+  },
+  "growth_past_agreement": {
+   "grown_to_digits": 17,
+   "fibonacci": true,
+   "gamma": true,
+   "fixed 9-bit": false,
+   "lenfield 4-bit": false
+  }
+ }
+}
