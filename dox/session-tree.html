@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The session tree · p4-phi dox</title>
+<meta name="description" content="An interactive tree of Claude desktop sessions as p4-phi links them: top sessions, children, grandchildren, detach, reparent, branching out and done.">
+<style>
+:root{
+  --bg:#f5f3ec; --panel:#fffdf7; --sunk:#efece2; --ink:#1d1c19; --soft:#5d5a52; --line:#d9d4c6; --link:#a9a392;
+  --phi:#0b6b66; --phi-bg:#dcefec; --app:#a85507; --app-bg:#f8e7d2; --you:#6a4bb0; --you-bg:#ebe4f7;
+  --ok:#2c7a3f; --bad:#b3261e; --bad-bg:#fbe5e2;
+  --mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+  --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131418; --panel:#1b1d23; --sunk:#16171c; --ink:#e9e6dd; --soft:#a29e93; --line:#33363f; --link:#5b5f6b;
+    --phi:#62d2c6; --phi-bg:#16312f; --app:#f1ab52; --app-bg:#3a2a14; --you:#b9a2f2; --you-bg:#2a2340;
+    --ok:#7fd494; --bad:#ff8a80; --bad-bg:#3d1c1a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131418; --panel:#1b1d23; --sunk:#16171c; --ink:#e9e6dd; --soft:#a29e93; --line:#33363f; --link:#5b5f6b;
+  --phi:#62d2c6; --phi-bg:#16312f; --app:#f1ab52; --app-bg:#3a2a14; --you:#b9a2f2; --you-bg:#2a2340;
+  --ok:#7fd494; --bad:#ff8a80; --bad-bg:#3d1c1a;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans)}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 64px}
+a{color:var(--phi)}
+code,pre,kbd{font-family:var(--mono)}
+code{font-size:.88em;background:var(--sunk);border-radius:4px;padding:1px 4px;overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--phi);outline-offset:2px}
+button,select,input{font:inherit;color:inherit}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mark{font:600 13px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--phi);text-decoration:none}
+.mark:hover{text-decoration:underline}
+.pill{font:600 12px/1 var(--mono);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:9px 13px;cursor:pointer;white-space:nowrap}
+.pill:hover{border-color:var(--phi)}
+h1{font-size:clamp(30px,5.4vw,46px);line-height:1.08;letter-spacing:-.02em;margin:16px 0 10px;text-wrap:balance}
+.lede{color:var(--soft);max-width:68ch;margin:0 0 8px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 22px;padding:0;list-style:none}
+.facts li{border-left:3px solid var(--line);padding:2px 0 2px 12px;font-size:14.5px;color:var(--soft)}
+.facts li b{display:block;color:var(--ink);font-size:15px}
+.facts li.f-app{border-color:var(--app)} .facts li.f-phi{border-color:var(--phi)} .facts li.f-you{border-color:var(--you)}
+
+.stage{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.treecard{position:sticky;top:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--sunk)}
+.seg button{border:0;background:none;border-radius:999px;padding:7px 12px;font:600 12.5px/1 var(--sans);cursor:pointer;color:var(--soft)}
+.seg button[aria-pressed="true"][data-view="phi"]{background:var(--phi);color:var(--panel)}
+.seg button[aria-pressed="true"][data-view="app"]{background:var(--app);color:var(--panel)}
+.bar select,.bar .ghostbtn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 9px;font-size:13.5px;cursor:pointer;max-width:100%}
+.bar .spacer{flex:1}
+.svgwrap{padding:6px 8px 4px;overflow:hidden}
+svg#tree{display:block;width:100%;user-select:none;-webkit-user-select:none}
+.hint{font-size:12.5px;color:var(--soft);padding:0 14px 10px;margin:0}
+.hint i{font-style:normal;display:inline-block;width:22px;border-top:2px dashed var(--app);vertical-align:middle;margin-right:5px}
+.hint i.p{border-color:var(--phi)}
+
+/* svg */
+.node{cursor:pointer;transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.node .box{fill:var(--panel);stroke:var(--line);stroke-width:1.4;transition:fill .15s,stroke .15s}
+.node:hover .box{stroke:var(--soft)}
+.node.sel .box{stroke:var(--phi);stroke-width:2.4;fill:var(--phi-bg)}
+.view-app .node.sel .box{stroke:var(--app);fill:var(--app-bg)}
+.node.retired{opacity:.62}
+.node.retired .box{stroke-dasharray:5 4}
+.node.target .box{stroke:var(--ok);stroke-width:2.6;fill:var(--phi-bg)}
+.node.badtarget .box{stroke:var(--bad);stroke-width:2.6;fill:var(--bad-bg)}
+.node.dragged{opacity:.35;pointer-events:none}
+.node.pulse .box{animation:pulse 1s ease-out}
+.node.born{animation:born .45s ease-out}
+.node .t{font:600 14px var(--sans);fill:var(--ink)}
+.node .m{font:11.5px var(--mono);fill:var(--soft)}
+.node .dot{fill:var(--link)}
+.node .dot.s-run{fill:var(--app)} .node .dot.s-done{fill:var(--ok)}
+.grip{cursor:grab;touch-action:none}
+.grip circle{fill:var(--link)}
+.grip rect{fill:transparent}
+.link{fill:none;stroke:var(--link);stroke-width:1.6}
+.link.fresh{stroke:var(--phi);stroke-width:2.2;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .55s .18s ease-out forwards,cool 1.6s 1s forwards}
+.view-app .link.fresh{stroke:var(--app)}
+.rail{fill:none;stroke:var(--link);stroke-width:1.4;stroke-dasharray:2 4}
+.ghost{fill:none;stroke-width:1.6;stroke-dasharray:5 4}
+.view-phi .ghost{stroke:var(--app)} .view-app .ghost{stroke:var(--phi)}
+.ghostend{stroke:none} .view-phi .ghostend{fill:var(--app)} .view-app .ghostend{fill:var(--phi)}
+.rootlabel{font:600 11px var(--mono);fill:var(--soft);letter-spacing:.08em}
+.rootzone{fill:transparent;stroke:transparent;stroke-dasharray:4 4;rx:8}
+.dragging .rootzone{fill:var(--sunk);stroke:var(--link)}
+.dragging .rootzone.target{fill:var(--phi-bg);stroke:var(--ok)}
+.fly{fill:var(--you);stroke:var(--panel);stroke-width:2}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes cool{to{stroke:var(--link);stroke-width:1.6}}
+@keyframes pulse{0%{stroke:var(--you);stroke-width:5}100%{stroke-width:1.4}}
+@keyframes born{from{opacity:0}to{opacity:1}}
+.dragchip{position:fixed;z-index:20;pointer-events:none;background:var(--ink);color:var(--bg);font:600 12.5px var(--sans);padding:6px 10px;border-radius:8px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform:translate(12px,12px)}
+
+.console{margin:0 12px 12px;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:12.5px/1.5 var(--mono);min-height:62px;overflow-wrap:anywhere}
+.console .cmd{color:var(--ink)} .console .cmd::before{content:"$ ";color:var(--soft)}
+.console .out{color:var(--phi)} .console .err{color:var(--bad)}
+.console .say{font:13.5px/1.45 var(--sans);color:var(--soft);margin-top:4px}
+details.tt{border-top:1px solid var(--line);padding:10px 14px}
+details.tt summary{cursor:pointer;font-size:13.5px;font-weight:600}
+details.tt pre{margin:10px 0 2px;font-size:11.5px;line-height:1.55;white-space:pre;overflow-x:auto;color:var(--soft)}
+
+/* panel */
+.panel{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.sec{padding:14px}
+.sec h2{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
+.selname{font-weight:650;font-size:17px;line-height:1.25;margin:0 0 4px;overflow-wrap:anywhere}
+.selmeta{font-size:13.5px;color:var(--soft);margin:0}
+.selmeta b{color:var(--ink);font-weight:600}
+.selmeta .differs{color:var(--bad);font-weight:600}
+.field{display:flex;gap:8px;align-items:center;margin:12px 0 0}
+.field label{font-size:13px;color:var(--soft);white-space:nowrap}
+.field input,.field select{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 9px;font-size:14px}
+.acts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:12px}
+.act{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 11px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
+.act:hover:not(:disabled){border-color:var(--ink)}
+.act:disabled{opacity:.42;cursor:not-allowed}
+.act.wide{grid-column:1/-1}
+.tag{font:600 10.5px/1 var(--mono);letter-spacing:.04em;border-radius:999px;padding:4px 7px;white-space:nowrap}
+.tag.app{background:var(--app-bg);color:var(--app)} .tag.phi{background:var(--phi-bg);color:var(--phi)}
+.tag.you{background:var(--you-bg);color:var(--you)} .tag.both{background:var(--sunk);color:var(--soft);border:1px solid var(--line)}
+.movebar{grid-column:1/-1;display:flex;gap:8px}
+.movebar select{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px;font-size:14px}
+.movebar .act{flex:none}
+
+.queue{display:grid;gap:8px;margin:4px 0 10px}
+.qrow{display:grid;grid-template-columns:10px minmax(0,1fr) minmax(0,1.3fr) 30px;gap:6px;align-items:center}
+.qrow .sw{width:10px;height:28px;border-radius:3px;background:var(--link)}
+.qrow input{min-width:0;width:100%;border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:7px 8px;font-size:13px}
+.qrow input.files{font-family:var(--mono);font-size:12px}
+.qrow button{border:1px solid var(--line);background:var(--bg);border-radius:7px;height:30px;cursor:pointer}
+.groups{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px;font-size:13.5px}
+.groups li{border-left:4px solid var(--link);padding:2px 0 2px 10px;min-width:0}
+.groups li small{display:block;font:11.5px var(--mono);color:var(--soft);overflow-wrap:anywhere}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 12px;font-size:14px;font-weight:600;cursor:pointer}
+.btn.go{background:var(--phi);border-color:var(--phi);color:var(--panel)}
+.btn:hover{border-color:var(--ink)}
+
+.ex h3{font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
+.ex .why{color:var(--soft);font-size:14.5px;margin:0 0 12px}
+.step{border:1px solid var(--line);border-radius:10px;margin:0 0 10px;overflow:hidden}
+.step .who{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;font-size:13.5px;background:var(--sunk)}
+.step .who span.by{min-width:0}
+.step pre{margin:0;padding:10px;font-size:12px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;border-top:1px solid var(--line)}
+.step pre.o{color:var(--phi);background:var(--sunk)}
+.step pre.o.e{color:var(--bad)}
+.step p{margin:0;padding:9px 10px;font-size:14px;border-top:1px solid var(--line)}
+.copy{font:600 11px/1 var(--mono);border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 8px;cursor:pointer;white-space:nowrap}
+.copy:hover{border-color:var(--phi)}
+.sides{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:12px 0 0}
+.side{border-radius:10px;padding:10px 11px;font-size:13.5px;line-height:1.45}
+.side b{display:block;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.side.app{background:var(--app-bg)} .side.app b{color:var(--app)}
+.side.phi{background:var(--phi-bg)} .side.phi b{color:var(--phi)}
+.later{border:1.5px dashed var(--you);border-radius:10px;padding:10px 11px;margin-top:10px;font-size:13.5px;background:var(--you-bg)}
+.later b{display:block;font:600 11px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--you);margin-bottom:5px}
+
+.rules{margin-top:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.rules h2{grid-column:1/-1;font-size:22px;margin:0;letter-spacing:-.01em}
+.rules p.intro{grid-column:1/-1;color:var(--soft);margin:-6px 0 0;max-width:70ch}
+.rule{border:1.5px dashed var(--you);border-radius:14px;padding:14px 16px;background:var(--panel)}
+.rule h3{margin:0 0 6px;font-size:16.5px}
+.rule ul{margin:0;padding-left:18px;font-size:14.5px;color:var(--soft)}
+.rule li{margin:3px 0}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--soft)}
+
+@media (max-width:980px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .treecard{position:static}
+  .facts{grid-template-columns:minmax(0,1fr)}
+  .rules{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:460px){
+  .acts{grid-template-columns:minmax(0,1fr)}
+  .sides{grid-template-columns:minmax(0,1fr)}
+  .qrow{grid-template-columns:10px minmax(0,1fr) 30px}
+  .qrow input.files{grid-column:2/3}
+  .qrow button{grid-row:1;grid-column:3}
+}
+@media (prefers-reduced-motion:reduce){
+  .node,.node .box{transition:none}
+  .link.fresh{animation:none;stroke-dasharray:none;stroke-dashoffset:0}
+  .node.pulse .box,.node.born{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="mark" href="index.html">← p4-phi · dox</a>
+    <button class="pill" id="theme" type="button" aria-label="Switch between light and dark">theme</button>
+  </div>
+  <h1>The session tree</h1>
+  <p class="lede">A session in the Claude desktop app is either a top session or a session that another session started. p4-phi hands tasks, notes and reports along those links. Make each move on the tree below, watch the links redraw, and copy the call or command that makes the move for real.</p>
+  <ul class="facts">
+    <li class="f-app"><b>The app keeps one record.</b>It is the nesting in the sidebar. It decides which session is told when a turn ends, and which sessions are archived together.</li>
+    <li class="f-phi"><b>phi keeps another.</b>It is <code>spawnedFrom</code> in each session's <code>session.json</code>. It decides who gets a session's background, notes and reports.</li>
+    <li class="f-you"><b>They can disagree.</b>Some moves change only one record. Switch the view above the tree to see each side, and follow the dashed line to the other side's parent.</li>
+  </ul>
+
+  <div class="stage">
+    <section class="card treecard" aria-label="The live tree">
+      <div class="bar">
+        <div class="seg" role="group" aria-label="Whose record to draw">
+          <button type="button" data-view="phi" aria-pressed="true">phi's tree</button>
+          <button type="button" data-view="app" aria-pressed="false">the app's sidebar</button>
+        </div>
+        <span class="spacer"></span>
+        <select id="preset" aria-label="Scenario">
+          <option value="one">One top session</option>
+          <option value="family">A small family</option>
+          <option value="today">Today's tree, 2026-11-16</option>
+        </select>
+        <button type="button" class="ghostbtn" id="reset">Reset</button>
+      </div>
+      <div class="svgwrap"><svg id="tree" role="group" aria-label="Sessions and their links"></svg></div>
+      <p class="hint" id="hint"></p>
+      <div class="console" id="console" aria-live="polite"></div>
+      <details class="tt">
+        <summary>What <code>phi.py tree</code> prints for this tree</summary>
+        <pre id="treetext"></pre>
+      </details>
+    </section>
+
+    <div class="panel">
+      <section class="card sec" aria-label="The selected session and its moves">
+        <h2>Selected session</h2>
+        <p class="selname" id="selname"></p>
+        <p class="selmeta" id="selmeta"></p>
+        <div class="field">
+          <label for="title">Next title</label>
+          <input id="title" type="text" maxlength="58" autocomplete="off">
+        </div>
+        <div class="acts" id="acts">
+          <button type="button" class="act" data-act="top">New top session <span class="tag both">app + phi</span></button>
+          <button type="button" class="act" data-act="child"><span id="childlabel">Start a child</span> <span class="tag app">app call</span></button>
+          <button type="button" class="act" data-act="request">Start it by request <span class="tag phi">phi</span></button>
+          <button type="button" class="act" data-act="branch">Branch out a queue <span class="tag both">app + phi</span></button>
+          <button type="button" class="act" data-act="detachApp">Detach in the app <span class="tag app">app call</span></button>
+          <button type="button" class="act" data-act="detachPhi">Detach in phi <span class="tag phi">phi</span></button>
+          <div class="movebar">
+            <select id="under" aria-label="Session to put the selected one under"></select>
+            <button type="button" class="act" data-act="reparent">Reparent <span class="tag phi">phi</span></button>
+          </div>
+          <button type="button" class="act" data-act="done">Mark done <span class="tag phi">phi</span></button>
+          <button type="button" class="act" data-act="again">Message it again <span class="tag you">ezexe</span></button>
+          <button type="button" class="act wide" data-act="archive">Archive it <span class="tag you">ezexe, by hand</span></button>
+        </div>
+      </section>
+
+      <section class="card sec" id="branch" hidden aria-label="Branch out a queue">
+        <h2>The queue to split</h2>
+        <div class="queue" id="queue"></div>
+        <ul class="groups" id="groups"></ul>
+        <div class="rowbtns">
+          <button type="button" class="btn" id="qadd">Add a task</button>
+          <button type="button" class="btn go" id="qgo">Start the children</button>
+          <button type="button" class="btn" id="qclose">Close</button>
+        </div>
+      </section>
+
+      <section class="card sec ex" id="example" aria-label="The worked example"></section>
+    </div>
+  </div>
+
+  <section class="rules" aria-label="Rules decided and not yet in the plugin">
+    <h2>Decided, and not yet in the plugin</h2>
+    <p class="intro">Two rules are settled and open as issues. The sessions follow them by hand today. Wherever this page describes them, it marks them with this dashed border.</p>
+    <div class="rule">
+      <h3><a href="https://github.com/ezexe/p4/issues/48">ezexe/p4#48</a>: one writer per file</h3>
+      <ul>
+        <li>There is one work tree, with no <code>git worktree</code> and no branch of a child's own.</li>
+        <li>phi refuses or holds a start whose file set overlaps a live session's file set.</li>
+        <li>Every brief declares its file set, and phi records it on the child's page. A brief with no file set is refused.</li>
+        <li>A leaf is one issue, one file set, one proving test and one commit. A child whose task spans more splits it again.</li>
+        <li>Only the session that started a child changes its queue. Only the tree's top session pushes.</li>
+      </ul>
+    </div>
+    <div class="rule">
+      <h3><a href="https://github.com/ezexe/p4/issues/49">ezexe/p4#49</a>: ezexe archives</h3>
+      <ul>
+        <li>No session archives another session or itself.</li>
+        <li>phi tells ezexe that a finished session is ready to archive, and only ezexe's own action in the app archives it.</li>
+        <li>The chain does not wait. The parent holds the <code>replaces:</code> note at once, and the tree and the relay treat the session as archived from then.</li>
+        <li>A marked session that is messaged again is named as reopened.</li>
+        <li>Briefs end with "report when done" in place of "archive when done".</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Every call and command here is read from the plugin's source: <code>phi.py</code>, <code>relay.py</code>, <code>starts.py</code> and the <code>phi</code> skill, in <a href="https://github.com/ezexe/p4">ezexe/p4</a> under <code>lbiza/plugins/p4-phi</code>. The tree is a model in your browser. Nothing on this page reaches a real session.
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- theme ---------- */
+var root=document.documentElement,TKEY="dox-theme",tbtn=document.getElementById("theme");
+function tcur(){return root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}
+function tlabel(){tbtn.textContent=tcur()==="dark"?"light theme":"dark theme"}
+try{var ts=localStorage.getItem(TKEY);if(ts==="dark"||ts==="light")root.setAttribute("data-theme",ts)}catch(e){}
+tlabel();
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",tlabel)}catch(e){}
+tbtn.addEventListener("click",function(){var n=tcur()==="dark"?"light":"dark";root.setAttribute("data-theme",n);try{localStorage.setItem(TKEY,n)}catch(e){}tlabel()});
+
+/* ---------- helpers ---------- */
+var NS="http://www.w3.org/2000/svg";
+var PHI='python -I -X utf8 "${CLAUDE_PLUGIN_ROOT}/scripts/phi.py"';
+var REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function $(id){return document.getElementById(id)}
+function h(tag,attrs,kids){var e=document.createElement(tag);if(attrs)for(var k in attrs){if(k==="text")e.textContent=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k])}(kids||[]).forEach(function(c){e.appendChild(typeof c==="string"?document.createTextNode(c):c)});return e}
+function s(tag,attrs){var e=document.createElementNS(NS,tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);return e}
+function hex(seed,n){var a=seed>>>0,out="";while(out.length<n){a=(a+0x6D2B79F5)>>>0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;out+=(((t^(t>>>14))>>>0).toString(16)+"00000000").slice(0,8)}return out.slice(0,n)}
+function newId(){var x=hex(7919*(++S.seq)+S.salt,32);return "local_"+x.slice(0,8)+"-"+x.slice(8,12)+"-"+x.slice(12,16)+"-"+x.slice(16,20)+"-"+x.slice(20,32)}
+function short(id){return id.slice(0,14)+"…"}
+function q(t){return '"'+t+'"'}
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+/* ---------- state ---------- */
+var S;
+function N(id){return S.nodes[id]}
+function mk(title,phi,app,extra){
+  var id=newId();
+  S.nodes[id]={id:id,title:title,phi:phi||null,app:app===undefined?(phi||null):(app||null),state:"no turn yet",turns:0,retired:false,shard:[],notes:0,tag:"",born:true};
+  if(extra)for(var k in extra)S.nodes[id][k]=extra[k];
+  S.order.push(id);return id;
+}
+function kids(id,v){return S.order.filter(function(k){return N(k)[v]===id})}
+function parentIn(id,v){var p=N(id)[v];return p&&N(p)?p:null}
+function desc(id,v){var out=[];(function w(x){kids(x,v).forEach(function(k){out.push(k);w(k)})})(id);return out}
+function rootOf(id,v){var c=id,g=0;while(parentIn(c,v)&&g++<40)c=parentIn(c,v);return c}
+function roots(v){return S.order.filter(function(k){return !parentIn(k,v)})}
+
+var PRESETS={
+  one:function(){
+    S.sel=mk("Plan the release",null,null,{state:"not shown done",turns:2,tag:"orchestrates"});
+  },
+  family:function(){
+    var a=mk("Plan the release",null,null,{state:"not shown done",turns:6,tag:"orchestrates"});
+    var b=mk("Build the changelog writer",a,a,{state:"not shown done",turns:3,shard:["tools/changelog.py","tools/test_changelog.py"]});
+    mk("Check the version bump against the tag",a,a,{state:"done",turns:1,tag:"read-only check"});
+    mk("Write the proving test",b,b,{state:"not shown done",turns:1,shard:["tools/test_changelog.py"]});
+    mk("Docs site upkeep",null,null,{state:"not shown done",turns:4,tag:"orchestrates"});
+    S.sel=b;
+  },
+  today:function(){
+    var o=mk("Multi-session orchestration and planning",null,null,{state:"not shown done",turns:4,tag:"orchestrates only"});
+    var f=mk("Claude desktop app file organization",null,null,{state:"not shown done",turns:67,tag:"orchestrates"});
+    var a=mk("Acceptance check",null,null,{state:"not shown done",turns:3,tag:"orchestrates"});
+    mk("Raise memory patches as p4 plugin issues",null,null,{state:"not shown done",turns:1,tag:"orchestrates"});
+    var p=mk("Puppeteer: orchestrators that watch and pioneer",null,null,{state:"not shown done",turns:16,tag:"orchestrates"});
+    mk("dox: interactive session-tree page",o,o,{state:"not shown done",turns:1,shard:["dox/"]});
+    mk("p4-phi: build #43, #44, #45, then #41",f,p,{state:"not shown done",turns:1,tag:"builder, serial run"});
+    mk("p4-temportal: every scratchpad becomes a link",f,o);
+    mk("Store: commit the ignore block and sync",f,o);
+    mk("p4-phi store: settle tracked and ignored",f,o);
+    mk("Fix p4-phi line bugs from the acceptance check",a,a,{state:"not shown done",turns:2});
+    mk("Check seven unverified p4-phi fixes",p,o,{tag:"read-only check"});
+    S.sel=o;
+  }
+};
+function load(name){
+  S={nodes:{},order:[],view:"phi",sel:null,seq:0,salt:{one:11,family:23,today:37}[name]||5,preset:name,links:{},titles:0,
+     queue:null,example:null,con:null};
+  PRESETS[name]();
+  S.order.forEach(function(k){N(k).born=false});
+  S.example={kind:"intro"};
+  S.con={say:name==="today"
+    ?"This is the shape phi.py tree printed on 2026-11-16, with two short side questions and one new top session left out. Five children came through start requests, so the app nests them somewhere else. Switch the view to see it."
+    :"Select a session, then choose a move. You can also drag a session by its grip onto another one."};
+  $("preset").value=name;$("branch").hidden=true;
+  render(true);
+}
+
+/* ---------- drawing ---------- */
+var svg=$("tree"),wrap=svg.parentNode,H=46,GAP=10,TOP=36;
+var gLinks=s("g"),gNodes=s("g"),gFx=s("g"),rootzone=s("rect",{class:"rootzone",x:1,y:1,height:24}),rootlabel=s("text",{class:"rootlabel",x:8,y:17});
+svg.appendChild(rootzone);svg.appendChild(rootlabel);svg.appendChild(gLinks);svg.appendChild(gNodes);svg.appendChild(gFx);
+var els={},pos={};
+function fit(t,text,max){t.textContent=text;if(t.getComputedTextLength()<=max)return;var n=text.length;while(n>1){n--;t.textContent=text.slice(0,n).replace(/\s+$/,"")+"…";if(t.getComputedTextLength()<=max)break}}
+function meta(n){
+  var v=S.view,o=v==="phi"?"app":"phi",parts=[n.retired?"done, retired":n.state,n.turns+" turn"+(n.turns===1?"":"s")];
+  if(n.tag)parts.push(n.tag);
+  if(n.shard.length)parts.push(n.shard.length+" file"+(n.shard.length===1?"":"s")+" in its shard");
+  if(n.notes)parts.push(n.notes+" replaces: note"+(n.notes===1?"":"s"));
+  if(parentIn(n.id,v)&&!parentIn(n.id,o))parts.push("top session in "+(o==="app"?"the app":"phi"));
+  return parts.join(" · ");
+}
+function render(still){
+  var v=S.view,W=Math.max(280,wrap.clientWidth-16),small=W<520,IND=small?18:28,X0=30,GUT=small?30:46;
+  svg.setAttribute("class","view-"+v+(drag&&drag.on?" dragging":""));
+  var rows=[];(function walk(ids,d){ids.forEach(function(id){rows.push({id:id,d:d});walk(kids(id,v),d+1)})})(roots(v),0);
+  var Ht=TOP+rows.length*(H+GAP)+6;
+  svg.setAttribute("viewBox","0 0 "+W+" "+Ht);svg.setAttribute("height",Ht);
+  rootzone.setAttribute("width",W-2);
+  rootlabel.textContent=drag&&drag.on?"ROOT · drop here to detach in phi":"ROOT · top sessions are siblings";
+  pos={};
+  rows.forEach(function(r,i){var x=X0+r.d*IND;pos[r.id]={x:x,y:TOP+i*(H+GAP),w:W-GUT-x,d:r.d}});
+  /* nodes */
+  Object.keys(els).forEach(function(id){if(!pos[id]){els[id].remove();delete els[id]}});
+  rows.forEach(function(r){
+    var n=N(r.id),p=pos[r.id],g=els[r.id];
+    if(!g){g=s("g",{"data-id":r.id,tabindex:0,role:"button"});els[r.id]=g;gNodes.appendChild(g);
+      if(n.born&&!still)g.classList.add("born");
+      if(still||n.born)g.style.transition="none";}
+    g.style.transform="translate("+p.x+"px,"+p.y+"px)";
+    if(g.style.transition==="none"){g.getBoundingClientRect();setTimeout(function(){g.style.transition=""},30)}
+    g.setAttribute("class","node"+(S.sel===r.id?" sel":"")+(n.retired?" retired":"")+(g.classList.contains("born")?" born":"")+(g.classList.contains("pulse")?" pulse":"")+(drag&&drag.on&&drag.id===r.id?" dragged":""));
+    g.setAttribute("aria-label",n.title+", "+meta(n));
+    while(g.firstChild)g.removeChild(g.firstChild);
+    g.appendChild(s("rect",{class:"box",width:p.w,height:H,rx:10}));
+    var grip=s("g",{class:"grip"});grip.appendChild(s("rect",{width:24,height:H}));
+    [[9,16],[15,16],[9,23],[15,23],[9,30],[15,30]].forEach(function(c){grip.appendChild(s("circle",{cx:c[0],cy:c[1],r:1.6}))});
+    g.appendChild(grip);
+    var t=s("text",{class:"t",x:28,y:20}),m=s("text",{class:"m",x:28,y:36});
+    g.appendChild(t);g.appendChild(m);
+    g.appendChild(s("circle",{class:"dot "+(n.state==="done"?"s-done":n.state==="not shown done"?"s-run":""),cx:p.w-14,cy:16,r:4.5}));
+    fit(t,n.title,p.w-28-30);fit(m,meta(n),p.w-28-12);
+    n.born=false;
+  });
+  /* links */
+  while(gLinks.firstChild)gLinks.removeChild(gLinks.firstChild);
+  var rs=roots(v).filter(function(k){return pos[k]}),now={};
+  if(rs.length){
+    var last=pos[rs[rs.length-1]],dd="M12 26 V"+(last.y+H/2);
+    rs.forEach(function(k){dd+=" M12 "+(pos[k].y+H/2)+" H"+X0});
+    gLinks.appendChild(s("path",{class:"rail",d:dd}));
+  }
+  rows.forEach(function(r){
+    var par=parentIn(r.id,v);if(!par||!pos[par])return;
+    var p=pos[par],c=pos[r.id],sx=p.x+9,ey=c.y+H/2,key=v+":"+r.id+">"+par;
+    var path=s("path",{class:"link"+(S.links[key]||still?"":" fresh"),"data-child":r.id,pathLength:1,
+      d:"M"+sx+" "+(p.y+H)+" V"+(ey-8)+" Q"+sx+" "+ey+" "+(sx+8)+" "+ey+" H"+c.x});
+    now[key]=1;gLinks.appendChild(path);
+  });
+  S.links=now;
+  /* the other side's parent, where it differs */
+  var o=v==="phi"?"app":"phi",R=W-GUT,any=false,lane=0;
+  rows.forEach(function(r){
+    var a=parentIn(r.id,v),b=parentIn(r.id,o);
+    if(!b||a===b||!pos[b])return;any=true;
+    var y1=pos[r.id].y+H/2,y2=pos[b].y+H/2+(y1>pos[b].y?6:-6),bulge=Math.min(GUT-8,16+(lane++%3)*((GUT-24)/2));
+    gLinks.appendChild(s("path",{class:"ghost",d:"M"+R+" "+y1+" C"+(R+bulge*1.3)+" "+y1+" "+(R+bulge*1.3)+" "+y2+" "+R+" "+y2}));
+    gLinks.appendChild(s("circle",{class:"ghostend",cx:R,cy:y2,r:3.4}));
+  });
+  var hint=$("hint");hint.innerHTML="";
+  if(any){hint.appendChild(h("i",v==="app"?{class:"p"}:null));
+    hint.appendChild(document.createTextNode(v==="phi"?"A dashed line runs from a session to the session the app nests it under, where that differs from phi's parent.":"A dashed line runs from a session to the session phi records as its parent, where that differs from the app's nesting."))}
+  else hint.textContent=v==="phi"?"You are looking at phi's record: who started whom, as spawnedFrom says.":"You are looking at the app's record: the nesting in the sidebar.";
+  document.querySelectorAll(".seg button").forEach(function(b){b.setAttribute("aria-pressed",b.getAttribute("data-view")===v?"true":"false")});
+  panel();treetext();consoleOut();example();
+}
+function treetext(){
+  var out=[];(function walk(ids,d){ids.forEach(function(id){var n=N(id);
+    out.push(Array(d+1).join("  ")+"- "+n.title+" ("+id+"): "+n.state+", "+n.turns+" turn"+(n.turns===1?"":"s"));walk(kids(id,"phi"),d+1)})})(roots("phi"),0);
+  $("treetext").textContent="$ "+PHI+" tree\n"+(out.join("\n")||"no sessions yet");
+}
+function consoleOut(){
+  var c=$("console"),x=S.con||{};c.innerHTML="";
+  (x.lines||[]).forEach(function(l){c.appendChild(h("div",{class:l[0],text:l[1]}))});
+  if(x.say)c.appendChild(h("div",{class:"say",text:x.say}));
+}
+function say(lines,text){S.con={lines:lines,say:text}}
+
+/* ---------- panel ---------- */
+var TOPS=["Topic: the release notes","Topic: flaky test hunt","Topic: store layout","Topic: hook timeouts","Topic: a second machine"];
+var CHILDREN=["Build the parser","Check the fix against the issue","Write the proving test","Audit the hook timeouts","Trace the slow start","Read the transcript format","Fix the report cut"];
+function nextTitle(top){var f=$("title"),t=f.value.trim();if(t){f.value="";return t.slice(0,58)}var pool=top?TOPS:CHILDREN;return pool[(S.titles++)%pool.length]}
+function nameOf(id){return id&&N(id)?N(id).title:""}
+function panel(){
+  var n=S.sel&&N(S.sel);
+  if(!n){S.sel=S.order[0]||null;n=S.sel&&N(S.sel)}
+  var acts=$("acts").querySelectorAll("[data-act]"),set=function(a,on){for(var i=0;i<acts.length;i++)if(acts[i].getAttribute("data-act")===a)acts[i].disabled=!on};
+  if(!n){$("selname").textContent="No session left";$("selmeta").textContent="Start a new top session, or reset.";
+    ["child","request","branch","detachApp","detachPhi","reparent","done","again","archive"].forEach(function(a){set(a,false)});$("under").innerHTML="";return}
+  var pp=parentIn(n.id,"phi"),ap=parentIn(n.id,"app");
+  $("selname").textContent=n.title;
+  var m=$("selmeta");m.innerHTML="";
+  m.appendChild(h("code",{text:n.id}));m.appendChild(h("br"));
+  m.appendChild(document.createTextNode("phi: "));m.appendChild(h("b",{text:pp?"started by "+q(nameOf(pp)):"a top session"}));m.appendChild(h("br"));
+  m.appendChild(document.createTextNode("the app: "));m.appendChild(h("b",{text:ap?"nested under "+q(nameOf(ap)):"at the top level"}));
+  if(pp!==ap){m.appendChild(h("br"));m.appendChild(h("span",{class:"differs",text:"The two records disagree about this session."}))}
+  $("childlabel").textContent=pp?(parentIn(pp,"phi")?"Start a child, one level deeper":"Start a grandchild"):"Start a child";
+  $("title").placeholder=CHILDREN[S.titles%CHILDREN.length];
+  set("child",!n.retired);set("request",!!pp&&!n.retired);set("branch",!n.retired);
+  set("detachApp",!!ap);set("detachPhi",!!pp);set("done",!n.retired&&n.state!=="done"||(!n.retired&&!!pp));
+  set("again",n.retired);set("archive",true);
+  var u=$("under"),keep=u.value;u.innerHTML="";var d=desc(n.id,"phi");
+  S.order.forEach(function(k){if(k===n.id)return;u.appendChild(h("option",{value:k,text:"under "+N(k).title+(d.indexOf(k)>=0?", which it started":k===pp?", where it is now":"")}))});
+  if(keep&&N(keep)&&keep!==n.id)u.value=keep;
+  set("reparent",S.order.length>1);
+}
+
+/* ---------- worked examples ---------- */
+function call(tool,obj){return tool+"\n"+JSON.stringify(obj,null,2)}
+function example(){
+  var box=$("example"),e=S.example||{kind:"intro"},x=EX[e.kind](e);
+  box.innerHTML="";
+  box.appendChild(h("h2",{text:"The worked example"}));
+  box.appendChild(h("h3",{text:x.title}));
+  box.appendChild(h("p",{class:"why",text:x.why}));
+  (x.steps||[]).forEach(function(st){
+    var who=h("div",{class:"who"},[h("span",{class:"by"},[h("span",{class:"tag "+st.side,text:{app:"app call",phi:"phi command",you:"ezexe"}[st.side]}),document.createTextNode(" "+st.by)])]);
+    var el=h("div",{class:"step"},[who]);
+    if(st.code){var b=h("button",{class:"copy",type:"button",text:"copy"});b.addEventListener("click",function(){copy(st.code,b)});who.appendChild(b);el.appendChild(h("pre",{text:st.code}))}
+    if(st.out)el.appendChild(h("pre",{class:"o"+(st.err?" e":""),text:st.out}));
+    if(st.note)el.appendChild(h("p",{text:st.note}));
+    box.appendChild(el);
+  });
+  if(x.app||x.phi)box.appendChild(h("div",{class:"sides"},[
+    h("div",{class:"side app"},[h("b",{text:"The app records"}),x.app||""]),
+    h("div",{class:"side phi"},[h("b",{text:"phi records"}),x.phi||""])]));
+  (x.later||[]).forEach(function(l){box.appendChild(h("div",{class:"later"},[h("b",{text:"Decided, not yet in the plugin · ezexe/p4#"+l[0]}),l[1]]))});
+}
+function copy(text,btn){
+  function ok(){btn.textContent="copied";setTimeout(function(){btn.textContent="copy"},1200)}
+  function old(){var t=h("textarea");t.value=text;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();try{document.execCommand("copy");ok()}catch(e){}t.remove()}
+  try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(ok,old);else old()}catch(e){old()}
+}
+var NEWTOP='This session is a new top session, orchestrating its own topic. Its first act: `mcp__ccd_session_mgmt__detach_session` with "self", so the app stops nesting it and its reports stop going to the starter, then `'+PHI+' detach`.';
+var EX={
+  intro:function(){return{title:"Choose a move",why:"Each move you make on the tree shows here as the call or command that performs it, with what the app and phi each write down. phi starts, stops and messages no session itself. It hands a session the exact call, and the session makes it.",
+    steps:[{side:"phi",by:"Print the tree from any session.",code:PHI+" tree"},
+           {side:"phi",by:"Print one session's page.",code:PHI+" show <sessionId>"}],
+    app:"Each session's record, with the session that started it and whether it is archived.",
+    phi:"One folder for each session under <project>/.claude/p4/phi/sessions/<sessionId>/, holding session.json, its turns, its notes and its page."}},
+  top:function(e){return{title:"A new top session",
+    why:"A top session is one nobody started. It orchestrates its own topic, and in the root every top session relays to the others as siblings. ezexe can start one by hand in the app, and then no move is needed. When a session starts one, it begins nested under its starter, so it must leave on both sides.",
+    steps:[
+      {side:"app",by:q(e.starterTitle)+" starts it, in a turn ezexe began.",code:call("mcp__ccd_session__start_session",{initiation:"user_asked",title:e.title,context:"fresh",use_worktree:false,
+        background:"ezexe raised a topic outside this session's task. The new session orchestrates that topic in the same checkout, on the same branch, and reports to no other session.",
+        prompt:"<the topic, with ezexe's words quoted>\n\n"+NEWTOP})},
+      {side:"app",by:"The new session's first act leaves the starter in the app.",code:call("mcp__ccd_session_mgmt__detach_session",{session_id:"self"})},
+      {side:"phi",by:"Then it leaves the starter in phi.",code:PHI+" detach",out:"already a top session",
+        note:"phi reads the new-top line in the brief and detaches the session itself at its first message. That is why this command finds the move already made."},
+      {side:"phi",by:"When the starter's turn was begun by another session, the app refuses the start. The starter keeps it as a start request with the same brief.",code:PHI+' request "'+e.title+'" --brief "<the whole brief, with the new-top lines>"'}],
+    app:"No nesting. The starter is no longer told when this session's turns end, and archiving the starter no longer archives it.",
+    phi:"spawnedFrom with an empty sessionId and the source detached. Its page reads: Session `"+short(e.id)+"`, a top session."}},
+  child:function(e){return{title:e.deep?"A grandchild, started the same way":"A child of "+q(e.parentTitle),
+    why:"A session starts another with the app's own tool. The brief names only what the task needs, because phi gives the child the rest."+(e.deep?" A child starts a grandchild with the same call. When the app refuses it, use the start request instead.":""),
+    steps:[
+      {side:"app",by:q(e.parentTitle)+" makes the call.",code:call("mcp__ccd_session__start_session",{initiation:"user_asked",title:e.title,context:"fresh",use_worktree:false,
+        background:"This is one step of the plan of \""+e.parentTitle+"\". It runs in the same checkout, on the same branch, and it reports to that session when done.",
+        prompt:"<the task, the files it may change, and what done looks like>\n\nReport when done."})}],
+    app:"The child nests under its starter in the sidebar. The starter is told when the child's turn ends.",
+    phi:"spawnedFrom with the starter's id and the source record. At its first message the child is given the tasks of the sessions above it, their notes, and the last turn of the sessions beside it. Each finished turn's report reaches the starter in full.",
+    later:e.deep?[]:[["49","The brief ends with \"report when done\". Today the plugin's own advice still says \"archive when done\"."]]}},
+  request:function(e){return{title:"A child by start request",
+    why:"The app refuses a start with user_asked in a turn ezexe did not begin. A child's turn is usually begun by another session's message, so a child that wants a grandchild writes a start request and carries on. The next turn ezexe begins, in any session of the store, starts it.",
+    steps:[
+      {side:"phi",by:q(e.reqTitle)+" keeps the request.",code:PHI+' request "'+e.title+'" --brief "<the whole brief>"',
+        out:"kept as start request "+e.rid+": the next turn ezexe begins, in any session of this store, starts it with `user_asked`, and phi makes it this session's child, its spawnedFrom, relays and archive line coming here. Do not ask ezexe to type anything or click a card; carry on with the rest of the task."},
+      {side:"app",by:"At ezexe's next message, phi hands "+q(e.starterTitle)+" this exact call.",code:call("mcp__ccd_session__start_session",{initiation:"user_asked",title:e.title,context:"fresh",use_worktree:false,
+        background:"Requested by the session \""+e.reqTitle+"\" ("+e.req+") in the project <project>, whose task is: <its task>.",
+        prompt:"<the whole brief>\n\nphi start request "+e.rid+" for "+e.req+"."})}],
+    app:"The child nests under the session that made the call, not under the session that asked for it. starts.py names this as claude-code#109282.",
+    phi:"The marker line at the end of the brief names the requester. At the child's first message phi writes spawnedFrom with the requester's id, the source requested, and the starter in from. start-requests.jsonl holds a row for request, claimed and started. A request nobody starts within 24 hours is dropped."}},
+  detachApp:function(e){return{title:"Detach in the app",
+    why:"This is the sidebar's Detach to top level. Only the session that started it can make the call, or the session itself with \"self\". It cannot be undone from a session.",
+    steps:[{side:"app",by:"The starter names the session. The session itself passes \"self\".",code:call("mcp__ccd_session_mgmt__detach_session",{session_id:e.id})}],
+    app:"The session stops nesting under its starter. It is no longer archived with it, and the starter is no longer told when its turns end.",
+    phi:"Nothing. phi.py tree still prints the session under "+(e.phiParent?q(e.phiParent):"no parent")+", and its reports still go there. Run phi's detach as well when the session should be a top session on both sides."}},
+  detachPhi:function(e){return{title:"Detach in phi",
+    why:"This makes the session a top session in phi's tree. Run it with no id from inside the session, or name the session from anywhere.",
+    steps:[{side:"phi",by:"Any session of the store can run it.",code:PHI+" detach "+e.id,out:"detached: it is a top session now"}],
+    app:"Nothing. The skill says it plainly: the app's sidebar does not follow either command. "+(e.appParent?"The app still nests it under "+q(e.appParent)+".":"The app already has it at the top level."),
+    phi:"spawnedFrom is rewritten with an empty sessionId, the source detached, and the old parent in from. The old parent's reports get a row saying the session left. Both pages are rendered again."}},
+  reparent:function(e){return{title:e.err?"A move phi refuses":e.same?"A move already made":"Reparent under "+q(e.underTitle),
+    why:"Reparent puts a session, with every session it started, under another one. You can drag a session by its grip onto its new parent, or choose the parent from the list.",
+    steps:[{side:"phi",by:"Give the session to move, then the session to put it under.",code:PHI+" reparent "+e.moved+" "+e.under,
+      out:e.err?"phi: a session cannot be put under itself or under a session it started":e.same?"already there":"reparented",err:e.err}],
+    app:"Nothing. The app has a call that detaches a session and none that puts one under another, so the sidebar keeps the old nesting.",
+    phi:e.err?"Nothing. The command exits with status 2.":e.same?"Nothing. The session was already there.":"spawnedFrom with the new parent's id, the source reparented, and the old parent in from. The session's latest turn is handed to the new parent's reports, and the old parent's reports note that it left."}},
+  branch:function(e){
+    var steps=[];
+    e.groups.forEach(function(g){
+      steps.push({side:"app",by:"One call for "+q(g.title)+(g.tasks.length>1?", a serial run of "+g.tasks.length+" tasks that share a file.":", a task whose files nobody else touches."),
+        code:call("mcp__ccd_session__start_session",{initiation:"user_asked",title:g.title,context:"fresh",use_worktree:false,
+          background:"One part of the queue of \""+e.parentTitle+"\", split by disjoint file sets. Everything stays in the one work tree, on the parent's branch, with one writer for each file.",
+          prompt:(g.tasks.length>1?"Do these in order, one commit each:\n"+g.tasks.map(function(t,i){return (i+1)+". "+t}).join("\n"):g.tasks[0])+"\n\nFiles you alone may change: "+g.files.join(", ")+"\n\nReport when done."})});
+      steps.push({side:"phi",by:"The child's first act declares its shard.",code:PHI+" shard "+g.files.join(" "),
+        out:"kept as this session's shard: "+g.files.map(function(f){return "<project>/"+f}).join(", ")+(g.clash?"\nphi: overlaps the shard of \""+g.clash.title+"\" ("+g.clash.id+"): "+g.clash.hit+" and "+g.clash.hit+". Agree with that session, by SendMessage to "+g.clash.id+", who changes what, before either edits it.":"")});
+    });
+    return{title:"Branch out by file set",
+      why:"A session holding a queue splits it so that no two sessions write the same file at once. Tasks that share a file go to one child as a serial run. Tasks with disjoint files each get a child, and those children run at the same time. A child whose task spans more splits it again the same way.",
+      steps:steps,
+      app:"Each child nests under the parent. The app knows nothing about file sets.",
+      phi:"Each child's shard is kept in its session.json. A message that names a path inside a shard is sent on to the session that holds it. Two sessions under one parent whose shards overlap are both told at once.",
+      later:[["48","phi refuses a brief with no file set, records the file set on the child's page at the start, and holds a start whose file set overlaps a live session's until that session reports done. Today the split is made by hand, and phi only warns after the overlap is declared."]]}},
+  done:function(e){
+    var steps=[{side:"phi",by:"The session says what was run and what it showed.",code:PHI+' done "<what was run and what it showed>"',out:"this turn will be kept as done"}];
+    if(e.parentTitle){
+      steps.unshift({side:"phi",by:"The session is marked to retire when its work is done. A brief saying \"archive when done\" marks it too.",code:PHI+" disposable",
+        out:"this session is retired when its work is done: its outcome kept as a replaces: note on the session that started it, which is told to archive it"});
+      steps.push({side:"phi",by:"At the end of that turn phi writes one note on "+q(e.parentTitle)+".",
+        out:'replaces: "'+e.title+'" ('+e.id+') as a live node: it finished and was started to be archived when done. Changed: <the files it changed>. Heads: <the branch heads it left>. Commits: <its commits>. Still open: nothing. Its findings, from its final report: "<the report>".'});
+      steps.push({side:"phi",by:"Today the parent's next message carries this line.",
+        out:'phi (p4-phi): finished, started to be archived when done, their outcome kept as a replaces: note on this session: "'+e.title+'" ('+e.id+'). Archive them now with `mcp__ccd_session_mgmt__archive_session`.'});
+    }
+    return{title:e.parentTitle?"Done, and retired to its parent":"Done, in a top session",
+      why:e.parentTitle?"The session's outcome moves to its parent as one replaces: note. The session is out of the relay from that moment. Its node stays in the tree until it is archived.":"A top session has no parent to retire to. Its turn is kept as done, and the tree prints it as done.",
+      steps:steps,
+      app:"Nothing yet. The session is still open in the sidebar.",
+      phi:e.parentTitle?"doneRetired in the child's session.json, and the note in the parent's notes.jsonl with the source phi archive-when-done retirement. Every session the parent starts later is given that note.":"The turn's row in turns.jsonl is kept as done.",
+      later:e.parentTitle?[["49","No session makes that archive call. phi tells ezexe the session is ready to archive, and ezexe archives it by hand in the app. The chain does not wait for that."]]:[]}},
+  again:function(e){return{title:"Messaged again, so live again",
+    why:"A retired session that gets a new message is a live node once more. phi clears the mark at that message, so the mark never hides work in progress.",
+    steps:[{side:"you",by:"ezexe, or another session with SendMessage, writes to the session.",note:"There is no command to run. The session's next message does it."}],
+    app:"A new turn in the same session.",
+    phi:"doneRetired and archived are cleared in its session.json. The replaces: note it left on its parent stays.",
+    later:[["49","phi also names the session as reopened to the sessions above it."]]}},
+  archive:function(e){return{title:"Archived by ezexe",
+    why:"Archiving is ezexe's move, made by hand in the app's sidebar. The app archives the sessions nested under a session with it, which is why a session that should live on is detached first.",
+    steps:[{side:"you",by:"ezexe archives "+q(e.title)+" in the sidebar.",note:e.count>1?"The app took "+(e.count-1)+" more session"+(e.count===2?"":"s")+" with it, and phi stopped printing them.":"Only this session left the tree."}],
+    app:"The session's record is marked archived.",
+    phi:"phi reads the archive from the app's record and keeps it in session.json, so other machines that sync the store see it too. phi.py tree no longer prints the session, or anything under it.",
+    later:[["49","Until this rule is built, a line from phi can still tell a parent to archive a child. The sessions follow the decided rule by hand and leave archiving to ezexe."]]}}
+};
+
+/* ---------- moves ---------- */
+function cmd(c){return ["cmd",c.replace(PHI,"phi.py")]}
+var ACT={
+  top:function(){
+    var st=S.sel&&N(S.sel)?rootOf(S.sel,"phi"):null,title=nextTitle(true),id=mk(title,null,null,{tag:"orchestrates"});
+    S.example={kind:"top",id:id,title:title,starterTitle:st?N(st).title:"A top session"};
+    say([["cmd","mcp__ccd_session__start_session, then detach_session \"self\""],["out","already a top session"]],"It sits in the root beside the others, as a sibling in both records.");
+    S.sel=id;S.view=S.view;
+  },
+  child:function(){
+    var p=N(S.sel),title=nextTitle(false),deep=!!parentIn(p.id,"phi"),id=mk(title,p.id,p.id);
+    if(p.turns===0){p.turns=1;p.state="not shown done"}
+    S.example={kind:"child",id:id,title:title,parentTitle:p.title,deep:deep};
+    say([["cmd","mcp__ccd_session__start_session from "+short(p.id)]],"The app nests it and phi records the same parent. Select it and start one more to go a level deeper.");
+    S.keepSel=true;
+  },
+  request:function(){
+    var r=N(S.sel),title=nextTitle(false),st=rootOf(r.id,"phi"),starter=N(st),id=mk(title,r.id,st),rid="req-"+hex(S.seq*131+7,10);
+    S.example={kind:"request",id:id,title:title,req:r.id,reqTitle:r.title,starterTitle:starter.title,rid:rid};
+    say([cmd(PHI+' request "'+title+'" --brief "…"'),["out","kept as start request "+rid]],"phi made it the child of the session that asked. The app nests it under "+q(starter.title)+", which made the call. Switch the view to see the two parents.");
+    S.view="phi";S.keepSel=true;
+  },
+  detachApp:function(){
+    var n=N(S.sel),pp=parentIn(n.id,"phi");n.app=null;
+    S.example={kind:"detachApp",id:n.id,phiParent:pp?N(pp).title:""};
+    say([["cmd","mcp__ccd_session_mgmt__detach_session {\"session_id\": \""+n.id+"\"}"]],pp?"The app moved it to the top level. phi's tree did not move.":"Both records now have it at the top.");
+    S.view="app";
+  },
+  detachPhi:function(){
+    var n=N(S.sel),ap=parentIn(n.id,"app");n.phi=null;
+    S.example={kind:"detachPhi",id:n.id,appParent:ap?N(ap).title:""};
+    say([cmd(PHI+" detach "+n.id),["out","detached: it is a top session now"]],ap?"phi made it a top session. The app's sidebar did not move.":"Both records now have it at the top.");
+    S.view="phi";
+  },
+  reparent:function(){move(S.sel,$("under").value)},
+  branch:function(){
+    if(!S.queue)S.queue=[
+      {t:"Tell siblings when a shard changes",f:"scripts/relay.py, scripts/test_relay.py"},
+      {t:"Keep a retired child's open steps",f:"scripts/relay.py, scripts/phi.py"},
+      {t:"Register a landed route",f:"scripts/puppeteer.py, scripts/test_puppeteer.py"},
+      {t:"Redraw the four diagrams",f:"README.md"},
+      {t:"Say report when done in every brief",f:"scripts/phi.py, scripts/plans.py"}];
+    $("branch").hidden=false;queueUI();
+    say([],"Edit the tasks and their files. Tasks that share a file fall into one serial child. Then start the children.");
+    if(wrap.clientWidth<700||window.innerWidth<=980)$("branch").scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"nearest"});
+  },
+  done:function(){
+    var n=N(S.sel),p=parentIn(n.id,"phi");
+    n.state="done";n.turns=Math.max(1,n.turns+(n.turns?0:1));
+    if(p){n.retired=true;N(p).notes++}
+    S.example={kind:"done",id:n.id,title:n.title,parentTitle:p?N(p).title:""};
+    say([cmd(PHI+' done "…"'),["out","this turn will be kept as done"]],p?"Its outcome went up to "+q(N(p).title)+" as a replaces: note. The node stays until ezexe archives it.":"The tree now prints it as done.");
+    S.view="phi";S.after=p?function(){fly(n.id,p)}:null;
+  },
+  again:function(){
+    var n=N(S.sel);n.retired=false;n.state="not shown done";n.turns++;
+    S.example={kind:"again"};
+    say([],"It is a live node again. The note it left on its parent stays.");
+  },
+  archive:function(){
+    var n=N(S.sel),gone={},title=n.title,up=parentIn(n.id,S.view)||parentIn(n.id,"phi");
+    gone[n.id]=1;desc(n.id,"phi").concat(desc(n.id,"app")).forEach(function(k){gone[k]=1});
+    var count=Object.keys(gone).length;
+    S.order=S.order.filter(function(k){return !gone[k]});
+    Object.keys(gone).forEach(function(k){delete S.nodes[k]});
+    S.order.forEach(function(k){var x=N(k);if(x.phi&&!N(x.phi))x.phi=null;if(x.app&&!N(x.app))x.app=null});
+    S.example={kind:"archive",title:title,count:count};
+    say([],"ezexe archived it by hand. "+(count>1?"The sessions under it in either record went with it.":"Nothing else moved."));
+    S.sel=up&&N(up)?up:(S.order[0]||null);
+  }
+};
+function move(moved,under){
+  var m=N(moved),u=N(under);if(!m||!u)return;
+  var bad=moved===under||desc(moved,"phi").indexOf(under)>=0,same=!bad&&m.phi===under;
+  if(!bad&&!same)m.phi=under;
+  S.example={kind:"reparent",moved:moved,under:under,underTitle:u.title,err:bad,same:same};
+  say([cmd(PHI+" reparent "+moved+" "+under),[bad?"err":"out",bad?"phi: a session cannot be put under itself or under a session it started":same?"already there":"reparented"]],
+    bad?"phi refuses it, because the move would make a loop.":same?"Nothing moved.":"It moved with every session it started. The app's sidebar did not follow.");
+  S.sel=moved;S.view="phi";render();
+}
+function run(a){
+  if(!ACT[a])return;
+  if(a!=="top"&&a!=="reparent"&&!(S.sel&&N(S.sel)))return;
+  if(a!=="branch")$("branch").hidden=true;
+  S.after=null;S.keepSel=false;
+  ACT[a]();
+  if(a==="reparent")return;
+  render();
+  if(S.after)S.after();
+  if(a!=="branch"&&window.innerWidth<=980){var r=wrap.getBoundingClientRect();if(r.bottom<60||r.top>window.innerHeight-120)wrap.scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"start"})}
+}
+$("acts").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(b&&!b.disabled)run(b.getAttribute("data-act"))});
+
+/* ---------- the note that travels to the parent ---------- */
+function fly(child,parent){
+  var g=els[parent];
+  function pulse(){if(!g)return;g.classList.remove("pulse");g.getBoundingClientRect();g.classList.add("pulse");setTimeout(function(){g.classList.remove("pulse")},1100)}
+  var p=gLinks.querySelector('path.link[data-child="'+child+'"]');
+  if(!p||REDUCED||!p.getTotalLength){pulse();return}
+  var L=p.getTotalLength(),c=s("circle",{class:"fly",r:6}),t0=null;gFx.appendChild(c);
+  function step(t){if(t0===null)t0=t;var k=Math.min(1,(t-t0)/850),pt=p.getPointAtLength(L*(1-k));c.setAttribute("cx",pt.x);c.setAttribute("cy",pt.y);
+    if(k<1&&c.isConnected)requestAnimationFrame(step);else{c.remove();pulse()}}
+  setTimeout(function(){requestAnimationFrame(step)},380);
+}
+
+/* ---------- branch out ---------- */
+var HUES=["var(--phi)","var(--app)","var(--you)","var(--ok)","var(--bad)","var(--soft)"];
+function files(t){return t.split(/[,\s]+/).map(function(x){return x.trim()}).filter(Boolean)}
+function groupsOf(){
+  var qs=S.queue.filter(function(t){return t.t.trim()&&files(t.f).length}),par=qs.map(function(_,i){return i});
+  function find(i){while(par[i]!==i)i=par[i]=par[par[i]];return i}
+  var seen={};
+  qs.forEach(function(t,i){files(t.f).forEach(function(f){if(f in seen)par[find(i)]=find(seen[f]);else seen[f]=i})});
+  var by={},out=[];
+  qs.forEach(function(t,i){var r=find(i);if(!(r in by)){by[r]={tasks:[],files:[],rows:[]};out.push(by[r])}
+    by[r].tasks.push(t.t.trim());by[r].rows.push(S.queue.indexOf(t));files(t.f).forEach(function(f){if(by[r].files.indexOf(f)<0)by[r].files.push(f)})});
+  out.forEach(function(g){var first=g.tasks[0];if(first.length>30)first=first.slice(0,31).replace(/\s+\S*$/,"");
+    g.title=g.tasks.length>1?"Serial run: "+first+", and "+(g.tasks.length-1)+" more":g.tasks[0].slice(0,58)});
+  return out;
+}
+function queueUI(){
+  var box=$("queue");box.innerHTML="";
+  S.queue.forEach(function(t,i){
+    var sw=h("span",{class:"sw"}),a=h("input",{type:"text",value:t.t,"aria-label":"Task "+(i+1)}),b=h("input",{type:"text",class:"files",value:t.f,"aria-label":"Files of task "+(i+1),spellcheck:"false"}),x=h("button",{type:"button","aria-label":"Remove task "+(i+1),text:"×"});
+    a.addEventListener("input",function(){t.t=a.value;groupsUI()});b.addEventListener("input",function(){t.f=b.value;groupsUI()});
+    x.addEventListener("click",function(){S.queue.splice(i,1);queueUI()});
+    box.appendChild(h("div",{class:"qrow"},[sw,a,b,x]));
+  });
+  groupsUI();
+}
+function groupsUI(){
+  var gs=groupsOf(),ul=$("groups"),sws=$("queue").querySelectorAll(".sw");ul.innerHTML="";
+  for(var i=0;i<sws.length;i++)sws[i].style.background="var(--line)";
+  gs.forEach(function(g,i){var c=HUES[i%HUES.length];g.rows.forEach(function(r){if(sws[r])sws[r].style.background=c});
+    var li=h("li",null,[h("span",{text:"Child "+(i+1)+": "+(g.tasks.length>1?"a serial run of "+g.tasks.length+" tasks":"one task, running beside the others")}),h("small",{text:g.files.join("  ")})]);
+    li.style.borderColor=c;ul.appendChild(li)});
+  $("qgo").textContent=gs.length?"Start "+gs.length+(gs.length===1?" child":" children"):"Nothing to start";$("qgo").disabled=!gs.length;
+}
+$("qadd").addEventListener("click",function(){S.queue.push({t:"A new task",f:"path/to/file.py"});queueUI()});
+$("qclose").addEventListener("click",function(){$("branch").hidden=true});
+$("qgo").addEventListener("click",function(){
+  var p=S.sel&&N(S.sel);if(!p)return;var gs=groupsOf();if(!gs.length)return;
+  var sib=kids(p.id,"phi").filter(function(k){return !N(k).retired});
+  gs.forEach(function(g){
+    g.clash=null;
+    sib.forEach(function(k){if(g.clash)return;var hit=N(k).shard.filter(function(f){return g.files.indexOf(f)>=0})[0];if(hit)g.clash={id:k,title:N(k).title,hit:hit}});
+    mk(g.title,p.id,p.id,{shard:g.files.slice(),tag:g.tasks.length>1?"serial run of "+g.tasks.length:""});
+  });
+  if(p.turns===0){p.turns=1;p.state="not shown done"}
+  var clash=gs.filter(function(g){return g.clash}).length;
+  S.example={kind:"branch",groups:gs,parentTitle:p.title};
+  say([["cmd","mcp__ccd_session__start_session × "+gs.length],cmd(PHI+" shard <its files>")],
+    gs.length+(gs.length===1?" child holds":" children hold")+" disjoint file sets, so "+(gs.length===1?"it has":"they have")+" one writer for each file."+(clash?" "+clash+" of them overlap a session that was already under this parent, and phi tells both.":""));
+  $("branch").hidden=true;S.view="phi";render();
+  if(window.innerWidth<=980)wrap.scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"start"});
+});
+
+/* ---------- select and drag ---------- */
+var drag=null,chip=null;
+function targetAt(x,y){
+  var el=document.elementFromPoint(x,y);if(!el||!svg.contains(el))return null;
+  var g=el.closest&&el.closest("[data-id]");if(g)return{id:g.getAttribute("data-id")};
+  if(el===rootzone)return{root:true};return null;
+}
+function mark(t){
+  Object.keys(els).forEach(function(k){els[k].classList.remove("target","badtarget")});rootzone.classList.remove("target");
+  if(!t)return;if(t.root){rootzone.classList.add("target");return}
+  var bad=t.id===drag.id||desc(drag.id,"phi").indexOf(t.id)>=0;els[t.id].classList.add(bad?"badtarget":"target");
+}
+svg.addEventListener("pointerdown",function(e){
+  var g=e.target.closest&&e.target.closest("[data-id]");if(!g||e.button>0)return;
+  drag={id:g.getAttribute("data-id"),x:e.clientX,y:e.clientY,can:e.pointerType==="mouse"||!!e.target.closest(".grip"),on:false,pid:e.pointerId};
+});
+window.addEventListener("pointermove",function(e){
+  if(!drag||!drag.can||e.pointerId!==drag.pid)return;
+  if(!drag.on){if(Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)<7)return;
+    drag.on=true;try{svg.setPointerCapture(drag.pid)}catch(x){}
+    chip=h("div",{class:"dragchip",text:N(drag.id).title});document.body.appendChild(chip);render()}
+  chip.style.left=e.clientX+"px";chip.style.top=e.clientY+"px";mark(targetAt(e.clientX,e.clientY));e.preventDefault();
+},{passive:false});
+function endDrag(e,cancel){
+  if(!drag||e.pointerId!==drag.pid)return;var d=drag,t=d.on&&!cancel?targetAt(e.clientX,e.clientY):null;
+  drag=null;if(chip){chip.remove();chip=null}try{svg.releasePointerCapture(d.pid)}catch(x){}
+  if(!d.on){if(!cancel&&N(d.id)){S.sel=d.id;render()}return}
+  mark(null);
+  if(t&&t.root){S.sel=d.id;if(parentIn(d.id,"phi")){$("branch").hidden=true;ACT.detachPhi();render()}else{say([cmd(PHI+" detach "+d.id),["out","already a top session"]],"Nothing moved.");render()}}
+  else if(t&&t.id)move(d.id,t.id);
+  else render();
+}
+window.addEventListener("pointerup",function(e){endDrag(e,false)});
+window.addEventListener("pointercancel",function(e){endDrag(e,true)});
+svg.addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ")return;var g=e.target.closest&&e.target.closest("[data-id]");if(!g)return;
+  e.preventDefault();S.sel=g.getAttribute("data-id");render();var again=els[S.sel];if(again)again.focus();
+});
+
+/* ---------- bar ---------- */
+document.querySelectorAll(".seg button").forEach(function(b){b.addEventListener("click",function(){S.view=b.getAttribute("data-view");S.links={};render()})});
+$("preset").addEventListener("change",function(){clear();load($("preset").value)});
+$("reset").addEventListener("click",function(){clear();load(S.preset)});
+function clear(){Object.keys(els).forEach(function(k){els[k].remove()});els={};$("title").value=""}
+var rw=0;
+if(window.ResizeObserver)new ResizeObserver(function(){var w=wrap.clientWidth;if(w!==rw){rw=w;if(S)render(true)}}).observe(wrap);
+else window.addEventListener("resize",function(){render(true)});
+load("family");
+})();
+</script>
+</body>
+</html>
