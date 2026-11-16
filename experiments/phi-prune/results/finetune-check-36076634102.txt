@@ -1,0 +1,11 @@
+resnet152 IMAGENET1K_V2: 5000 train / 2000 test images at 128 px, 2 threads
+dense fine-tune done (10.5 min)
+pruned fine-tune done (73.2 min)
+
+model                fp32    fp16  non-finite fp16  (fp16 on the first 256)
+dense              88.75%  86.72%             0.0%
+pruned             31.70%  30.08%             0.0%
+enc per layer       9.25%  10.16%             0.0%
+enc per channel    32.85%  34.77%             0.0%
+
+total 101.2 min

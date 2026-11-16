@@ -1,0 +1,10 @@
+# phi-prune
+
+The measurements of the pruning core of ezexe/phi, with the result files they produced.
+Each script imports `phi_prune`, so install phi first: `pip install git+https://github.com/ezexe/phi`, or `pip install -e <checkout of ezexe/phi>`, with torch beside it.
+Run the scripts from this folder, so that the paths they name under `results/` resolve here.
+
+- `scripts/measure_detection.py`: `python scripts/measure_detection.py` measures the share of single-digit flips that the minimal-form check catches, on synthetic weights in about 16 seconds on a CPU with no download, and `results/measure_detection.txt` is a run with its defaults; `--models resnet18,resnet50` measures torchvision's models instead after `pip install torchvision`.
+- `scripts/probe_pretrained_encoding.py`: after `pip install torchvision`, `python scripts/probe_pretrained_encoding.py --models resnet152:IMAGENET1K_V2,resnet152:IMAGENET1K_V1 --images 64` probes per-tensor quantization of ImageNet-pretrained ResNets in fp32 and under CPU fp16 autocast, and `--strategies tensor,channel,clip99.9` compares quantization strategies instead; it downloads the weights and CIFAR-10, and `results/probe-encoding-36060638869.txt` and `results/probe-encoding-36066245824.txt` are one run of each mode, from Actions runs of ezexe/phi.
+- `scripts/finetune_encode_check.py`: after `pip install torchvision`, `python scripts/finetune_encode_check.py --arch resnet152 --weights IMAGENET1K_V2` fine-tunes, prunes and quantizes a ResNet on CIFAR-10 on a CPU, which with the defaults took 50.9 minutes from the first fine-tune to the last score on a GitHub runner with 2 threads, and `results/finetune-check-36070148204.txt` and `results/finetune-check-36076634102.txt` are two runs, from Actions runs of ezexe/phi.
+- `notebooks/quickstart_gpu.ipynb`: open it in Colab on a GPU runtime; its install cell clones ezexe/phi and installs it, and its cells fine-tune, prune, quantize and check torchvision ResNets on CIFAR-10.

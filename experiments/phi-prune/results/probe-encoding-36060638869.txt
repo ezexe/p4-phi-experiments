@@ -1,0 +1,27 @@
+64 images at 224 px (32 in fp16), 10-digit codewords, 2 threads
+
+resnet152 IMAGENET1K_V2  (9.7 min)
+  variant      nonfinite32 nonfinite16  agree32  agree16  max|block|  first block over 65504
+  dense               0.0%        0.0%   100.0%   100.0%       68.89  -
+  dense+enc           0.0%        0.0%     0.0%     0.0%        1051  -
+  pruned              0.0%        0.0%     0.0%     0.0%       60.02  -
+  pruned+enc          0.0%        0.0%     0.0%     0.0%       239.8  -
+  worst layer rel. error: dense+enc 0.1863 (layer3.0.downsample.0.weight), pruned+enc 0.1631 (layer3.0.downsample.0.weight)
+
+
+resnet152 IMAGENET1K_V1  (9.7 min)
+  variant      nonfinite32 nonfinite16  agree32  agree16  max|block|  first block over 65504
+  dense               0.0%        0.0%   100.0%   100.0%       29.37  -
+  dense+enc           0.0%        0.0%    90.6%    90.6%       29.49  -
+  pruned              0.0%        0.0%     0.0%     0.0%       6.745  -
+  pruned+enc          0.0%        0.0%     0.0%     0.0%       6.413  -
+  worst layer rel. error: dense+enc 0.1656 (layer4.0.downsample.0.weight), pruned+enc 0.1586 (layer4.0.downsample.0.weight)
+
+
+resnet50 IMAGENET1K_V2  (3.5 min)
+  variant      nonfinite32 nonfinite16  agree32  agree16  max|block|  first block over 65504
+  dense               0.0%        0.0%   100.0%   100.0%       89.15  -
+  dense+enc           0.0%        0.0%     0.0%     0.0%        3645  -
+  pruned              0.0%        0.0%     0.0%     0.0%       23.99  -
+  pruned+enc          0.0%        0.0%     0.0%     0.0%       24.42  -
+  worst layer rel. error: dense+enc 0.1415 (layer4.2.conv2.weight), pruned+enc 0.1391 (layer4.2.conv2.weight)

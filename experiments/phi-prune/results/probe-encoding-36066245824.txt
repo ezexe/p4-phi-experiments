@@ -1,0 +1,34 @@
+resnet152 IMAGENET1K_V2: dense+encoded vs dense, fp32, 64 images
+  strategy      agree  logit rel err  mean layer err   worst
+  tensor         0.0%          7.483          0.0760  0.1863
+  channel       93.8%          0.075          0.0213  0.0387
+  clip99.9       0.0%          6.420          0.1153  0.2879
+  clip99.99      0.0%          1.958          0.0598  0.1254
+  clip99.999    65.6%          0.495          0.0583  0.1206
+
+
+resnet101 IMAGENET1K_V2: dense+encoded vs dense, fp32, 64 images
+  strategy      agree  logit rel err  mean layer err   worst
+  tensor         0.0%          1.545          0.0761  0.1955
+  channel       95.3%          0.081          0.0216  0.0395
+  clip99.9       0.0%          1.536          0.1176  0.2537
+  clip99.99      7.8%          1.152          0.0608  0.1335
+  clip99.999    75.0%          0.237          0.0590  0.1237
+
+
+resnet50 IMAGENET1K_V2: dense+encoded vs dense, fp32, 64 images
+  strategy      agree  logit rel err  mean layer err   worst
+  tensor         0.0%         99.269          0.0668  0.1415
+  channel       87.5%          0.112          0.0207  0.0355
+  clip99.9       0.0%          1.489          0.1050  0.2135
+  clip99.99      0.0%          3.518          0.0530  0.1016
+  clip99.999     0.0%         22.836          0.0529  0.0972
+
+
+resnet152 IMAGENET1K_V1: dense+encoded vs dense, fp32, 64 images
+  strategy      agree  logit rel err  mean layer err   worst
+  tensor        90.6%          0.083          0.0626  0.1656
+  channel       95.3%          0.039          0.0183  0.0300
+  clip99.9      23.4%          0.629          0.0936  0.1962
+  clip99.99     71.9%          0.350          0.0497  0.1068
+  clip99.999    81.2%          0.177          0.0490  0.0939
