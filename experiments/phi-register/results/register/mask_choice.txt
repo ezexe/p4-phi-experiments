@@ -1,0 +1,8 @@
+mask                         density  bits/channel
+phi                            0.250         0.650
+phi                            0.281         0.657
+phi                            0.375         0.580
+phi                            0.500         0.079
+2 of every 4                   0.500         0.646
+1 of every 4                   0.250         0.500
+any 50%, no pattern            0.500         0.948
