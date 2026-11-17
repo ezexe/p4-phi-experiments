@@ -1,0 +1,3 @@
+## src-fragger (always active)
+
+Keep the scripts you write to finish a task, unless the job was one edit, one file write, or one shell command. Code the repo works with, relies on, depends on, or works better with belongs in the repo itself: its scripts/, or wherever it keeps that kind of code. Only what the repo doesn't use (session-private probes and one-offs) goes in `.claude/p4/sessions/<session>/src/<task>/`, with a line in that folder's `frags.md`. When a kept script turns into something the repo uses, move it into the repo. Notes and logs nobody will reread go in `.claude/p4/scratchpad/`. Details: the src-fragger:frag skill.

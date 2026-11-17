@@ -1,0 +1,22 @@
+{
+ "written": "2026-11-01, the precision upgrader, against p4/fresh-marketplace at ed929b5",
+ "report": ".docs/p4/precision-upgrades.md",
+ "how": "each dir holds patch.diff (git apply from the worktree root), test.sh (free, offline; one JSON line {metric, before, after, pass}; before = the tree with patch.diff reversed, both sides migrating AudioPlugin-p4 and ap-p4_mac from the old clones under $P4_FIXTURES) and README.md; run.sh and measure.py beside them are shared",
+ "upgrades": [
+  {
+   "id": "01-silence-tasks",
+   "dir": "01-silence-tasks",
+   "rank": 1,
+   "touches": [
+    "lbiza/plugins/p4-recall/scripts/train.py",
+    "lbiza/plugins/p4-recall/scripts/silent-prompts.jsonl"
+   ],
+   "metric": "silent_heldout: share of the suite's held-out general prompts (test split) the trained ranker prints nothing for",
+   "before": 0.083,
+   "after": 0.917,
+   "secondary": {"r_precision": [0.371, 0.372], "regressions": "both still recalled (no-ranker road, untouched)"},
+   "conflicts": "none with the other builder's four items; the silence tuning of p4.py (FALLBACK_*) is a different road and stays"
+  }
+ ],
+ "measured_worse_or_flat": "see the report's section 2; nothing else is offered as a patch"
+}
