@@ -3,7 +3,9 @@
 
 Run: PHI_REPO=<checkout of ezexe/phi> python -m pytest experiments/phi-suite/test_core_cuda.py
 with a Python whose torch is a CUDA build, on a machine with an NVIDIA GPU; without CUDA the test is skipped.
-PHI_REPO defaults to the folder `phi` beside `experiments`, and goes first on sys.path, so its phi_prune is the one tested.
+PHI_REPO defaults to the folder `phi` beside `experiments`.
+Its Python project, the folder `lbiza` inside the checkout, goes first on sys.path, so its phi_prune is the one tested.
+An older checkout keeps the project in its folder `phi` or at the top, and the test reads it there.
 The test left ezexe/phi's tests/test_core.py because every machine that runs that suite has a CPU build of torch.
 """
 
@@ -16,7 +18,8 @@ import torch
 import torch.nn as nn
 
 PHI_REPO = Path(os.environ.get("PHI_REPO", Path(__file__).resolve().parents[2] / "phi"))
-sys.path.insert(0, str(PHI_REPO))
+PHI_PROJECT = next((PHI_REPO / d for d in ("lbiza", "phi") if (PHI_REPO / d / "pyproject.toml").is_file()), PHI_REPO)
+sys.path.insert(0, str(PHI_PROJECT))
 
 from phi_prune.api import check, finetune, prune  # noqa: E402
 

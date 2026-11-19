@@ -32,7 +32,7 @@ cells.append(code("""# installs phi when this Python cannot import phi_prune.reg
 import importlib.util, subprocess, sys
 if importlib.util.find_spec("phi_prune.register") is None:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
-                           "git+https://github.com/ezexe/phi.git"])"""))
+                           "git+https://github.com/ezexe/phi.git#subdirectory=lbiza"])"""))
 cells.append(md("""## 1. One pruned, quantized convolution layer
 
 ResNet-18's `layer3.0.conv1`, with 256 output channels and a fan-in of 128 × 3 × 3 = 1152, with torchvision's ImageNet weights, φ-pruned and quantized per output channel to the 144 levels of 10 Zeckendorf digits, as in the README pipeline.

@@ -50,7 +50,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 OUT = HERE / "out"
-sys.path.insert(0, str(ROOT / "phi"))
+sys.path.insert(0, str(ROOT / "phi" / "lbiza"))
 sys.path.insert(0, str(ROOT / "p4" / "lbiza" / "plugins" / "p4-recall" / "scripts"))
 
 STOP, EDITED, INVOKED, CITED = 1, 2, 3, 4

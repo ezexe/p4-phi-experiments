@@ -1,7 +1,7 @@
 # phi-prune
 
 The measurements of the pruning core of ezexe/phi, with the result files they produced.
-Each script imports `phi_prune`, so install phi first: `pip install git+https://github.com/ezexe/phi`, or `pip install -e <checkout of ezexe/phi>`, with torch beside it.
+Each script imports `phi_prune`, so install phi first: `pip install "git+https://github.com/ezexe/phi#subdirectory=lbiza"`, or `pip install -e <checkout of ezexe/phi>/lbiza`, with torch beside it.
 Run the scripts from this folder, so that the paths they name under `results/` resolve here.
 
 - `scripts/measure_detection.py`: `python scripts/measure_detection.py` measures the share of single-digit flips that the minimal-form check catches, on synthetic weights in about 16 seconds on a CPU with no download, and `results/measure_detection.txt` is a run with its defaults; `--models resnet18,resnet50` measures torchvision's models instead after `pip install torchvision`.

@@ -5,7 +5,7 @@ These files moved here from ezexe/phi, which keeps the package, its fast tests a
 
 ## Run
 
-phi is the package `phi-prune` of ezexe/phi: the project's `.venv` holds it installed from the checkout with `pip install -e phi`, and elsewhere `pip install git+https://github.com/ezexe/phi.git` installs it.
+phi is the package `phi-prune` of ezexe/phi: the project's `.venv` holds it installed from the checkout with `pip install -e phi/lbiza`, and elsewhere `pip install "git+https://github.com/ezexe/phi.git#subdirectory=lbiza"` installs it.
 Each command runs from the repository's root, and each file under `results/` is what its script printed or wrote.
 
 ```bash

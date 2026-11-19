@@ -9,7 +9,7 @@ No store, project or person is built in: every experiment reads the store you po
 | Path | What it is | Tracked here |
 |---|---|---|
 | `p4/` | the p4 marketplace (plugins, session scripts, notebooks) | no, its own repo |
-| `phi/` | the phi models (phi_prune, phi_rank, phi_store, phi_serve, phi_model) | no, its own repo |
+| `phi/` | the phi models; its Python project in `phi/lbiza/` holds phi_prune, phi_rank, phi_store, phi_model and their tests | no, its own repo |
 | `.claude/p4/` | this project's own session store, when p4-recall runs here; its own git repository | no |
 | `.venv/` | the one Python environment both repos build and test under | no |
 | `.env` | API keys and the store under test, copied from `.env.example` | no |
@@ -23,7 +23,7 @@ No store, project or person is built in: every experiment reads the store you po
 git clone https://github.com/ezexe/p4 p4
 git clone https://github.com/ezexe/phi phi
 python -m venv .venv            # 3.14; on Windows: py -3.14 -m venv .venv
-.venv/bin/python -m pip install -r requirements.lock -e ./phi[dev]     # Windows: .venv/Scripts/python
+.venv/bin/python -m pip install -r requirements.lock -e ./phi/lbiza[dev]     # Windows: .venv/Scripts/python
 cp .env.example .env
 ```
 
@@ -41,7 +41,7 @@ The owner's names are never typed in anywhere: the experiments that send store t
 All offline, no key, no store needed (each builds its own fixture):
 
 ```bash
-.venv/bin/python -m pytest -q phi
+(cd phi/lbiza && ../../.venv/bin/python -m pytest -q)     # from phi's project folder, so pytest reads its pyproject.toml
 .venv/bin/python -I experiments/keep_or_go/test_keep_or_go.py
 .venv/bin/python -I experiments/served_back/test_served_back.py
 .venv/bin/python -I experiments/says_vs_does/test_says_vs_does.py

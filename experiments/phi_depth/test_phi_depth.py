@@ -12,7 +12,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(ROOT / "phi" / "tests"))
+sys.path.insert(0, str(ROOT / "phi" / "lbiza" / "tests"))
 import torch  # noqa: E402
 
 import phi_depth as pd  # noqa: E402

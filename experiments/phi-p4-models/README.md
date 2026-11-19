@@ -6,7 +6,7 @@ The repository's own [README](../../README.md) says how this checkout sits besid
 
 ## What they need
 
-phi is the package `phi-prune` of ezexe/phi: `pip install git+https://github.com/ezexe/phi`, or `pip install -e <checkout of ezexe/phi>`, with torch beside it.
+phi is the package `phi-prune` of ezexe/phi: `pip install "git+https://github.com/ezexe/phi#subdirectory=lbiza"`, or `pip install -e <checkout of ezexe/phi>/lbiza`, with torch beside it.
 Run each command from this folder.
 The three suites read a pairs file that only the vlds plugin's `scripts/pick_model.py pairs --jsonl` writes, and `nested_suite.py` and `directions_suite.py` also need the plugin itself and a store of its layout, with a `sessions/<id>/vlds` folder.
 ezexe/p4 holds that plugin up to commit f2323b2, and its child 1750fa2 deletes it; a p4-phi store has no such folder, so a run needs a store and a p4 checkout from that time.

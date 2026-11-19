@@ -264,8 +264,9 @@ save_json(STATE, st)
 PLUGIN = P4 / "lbiza" / "plugins" / "vlds"
 PICK = PLUGIN / "scripts" / "pick_model.py"
 SUITE = EXP / "scripts" / "nested_suite.py"
-run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "-e", str(PHI)], "setup")
-sys.path.insert(0, str(PHI))
+PHI_PROJECT = next((PHI / d for d in ("lbiza", "phi") if (PHI / d / "pyproject.toml").is_file()), PHI)   # phi's Python project; an older pin keeps it in phi/ or at the top
+run([sys.executable, "-m", "pip", "install", "-q", "--no-deps", "-e", str(PHI_PROJECT)], "setup")
+sys.path.insert(0, str(PHI_PROJECT))
 
 # the training device, checked once per runtime: a short pretrain and fine-tune on it, the CPU if that fails
 import torch
@@ -428,7 +429,7 @@ if done("tree") and (saved / "tree-oof.json").exists():
             shutil.copy2(saved / f, MODELS / f)
 else:
     run([sys.executable, "-m", "phi_rank.tree", "train", "--p4", STORE, "--pairs", PAIRS, "--k", TREE_K,
-         "--minutes", TREE_MINUTES, "--epochs", EPOCHS, "--now", now()], "tree", cwd=PHI)
+         "--minutes", TREE_MINUTES, "--epochs", EPOCHS, "--now", now()], "tree", cwd=PHI_PROJECT)
     shutil.copytree(MODELS / "tree", saved / "tree", dirs_exist_ok=True)
     for f in TREE_FILES:
         shutil.copy2(MODELS / f, saved / f)

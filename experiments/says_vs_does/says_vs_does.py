@@ -35,6 +35,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 P4 = ROOT / "p4"
 PHI = ROOT / "phi"
+PHI_PROJECT = PHI / "lbiza"                     # phi's Python project: pyproject.toml, the packages and the tests
 RECALL = P4 / "lbiza" / "plugins" / "p4-recall"
 SCRIPTS = RECALL / "scripts"
 DEFAULT_STORE = ROOT / "experiments" / "served_back" / "out" / "branches" / "win"
@@ -469,7 +470,7 @@ def _(ctx):
 @claim("phi-model-subcommands", "phi/README.md: 'phi_model ... (check|init|train|test|update|mode)'",
        "phi_model's parser has exactly those six subcommands.")
 def _(ctx):
-    src = read(PHI / "phi_model" / "__init__.py")
+    src = read(PHI_PROJECT / "phi_model" / "__init__.py")
     m = re.search(r"for name in \(([^)]*)\):\s*\n\s*p = sub\.add_parser\(name\)", src)
     got = set(re.findall(r'"([a-z]+)"', m.group(1))) if m else set(re.findall(r'add_parser\("([a-z]+)"', src))
     return (HOLDS if got == {"check", "init", "train", "test", "update", "mode"} else DRIFTED), f"parser: {sorted(got)}"
@@ -504,7 +505,7 @@ def _(ctx):
 @claim("phi-rank-cli", "phi_rank docstring: 'python -m phi_rank pretrain | train | eval' (and shared)",
        "phi_rank's parser has pretrain, train, eval and shared.")
 def _(ctx):
-    src = read(PHI / "phi_rank" / "__init__.py")
+    src = read(PHI_PROJECT / "phi_rank" / "__init__.py")
     got = set(re.findall(r'add_parser\("([a-z]+)"', src))
     m = re.search(r"for name in \(([^)]*)\):\s*\n\s*p = sub\.add_parser\(name\)", src)
     if m:
@@ -515,7 +516,7 @@ def _(ctx):
 @claim("phi-serve-endpoints", "phi_serve docstring: 'GET /health ... POST /score'",
        "phi_serve answers /health and /score.")
 def _(ctx):
-    src = read(PHI / "phi_serve" / "__init__.py")
+    src = read(PHI_PROJECT / "phi_serve" / "__init__.py")
     return (HOLDS if '"/health"' in src and '"/score"' in src else DRIFTED), f"/health in code: {'/health' in src}; /score in code: {'/score' in src}"
 
 
@@ -582,14 +583,14 @@ def _(ctx):
     if not hasattr(ph.rank, "sidecar_name"):
         return NOT_YET, "phi_rank has one SIDECAR name for every store"
     name = ph.rank.sidecar_name(str(ctx.store)) if ctx.has_store() else ph.rank.SIDECAR_RECALL
-    return (MET if name != "ranker.json" else NOT_YET), f"in a p4-recall store the sidecar is {name!r}; read_sidecar ignores a file of the plugin's kind: {'kind' in read(PHI / 'phi_rank' / '__init__.py').split('def read_sidecar')[1][:600]}"
+    return (MET if name != "ranker.json" else NOT_YET), f"in a p4-recall store the sidecar is {name!r}; read_sidecar ignores a file of the plugin's kind: {'kind' in read(PHI_PROJECT / 'phi_rank' / '__init__.py').split('def read_sidecar')[1][:600]}"
 
 
 @claim("phi-store-new-layout", "says-claim phi-readme-store",
        "phi_store reads a p4-recall store into pretrain and pair records, and phi_rank builds pools from its labels without a pairs file.", bar="better")
 def _(ctx):
     ph = phi()
-    src = read(PHI / "phi_rank" / "__init__.py")
+    src = read(PHI_PROJECT / "phi_rank" / "__init__.py")
     pools = "labels.tsv" in src and ("def pools_from_labels" in src or "def read_label_pools" in src or "labels_pools" in src or "from_labels" in src)
     found = f"phi_rank builds pools from labels.tsv: {pools}"
     if not ctx.has_store():
